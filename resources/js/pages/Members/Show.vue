@@ -187,7 +187,29 @@ const formatCurrency = (amount: number, currency: string) => {
 
             <!-- Subscriptions -->
             <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                <h2 class="text-lg font-semibold mb-4">Subscriptions</h2>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold">Subscriptions</h2>
+                    <a
+                        :href="`/members/${member.id}/subscriptions/create`"
+                        class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"
+                            />
+                        </svg>
+                        New Subscription
+                    </a>
+                </div>
                 <div v-if="member.subscriptions.length > 0" class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead class="border-b border-sidebar-border">
@@ -196,6 +218,7 @@ const formatCurrency = (amount: number, currency: string) => {
                                 <th class="px-4 py-2 text-left font-medium">Start Date</th>
                                 <th class="px-4 py-2 text-left font-medium">End Date</th>
                                 <th class="px-4 py-2 text-left font-medium">Status</th>
+                                <th class="px-4 py-2 text-left font-medium">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-sidebar-border/50">
@@ -207,6 +230,41 @@ const formatCurrency = (amount: number, currency: string) => {
                                     <span :class="getStatusClass(subscription.status)" class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium">
                                         {{ subscription.status }}
                                     </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex gap-2">
+                                        <form
+                                            v-if="subscription.status === 'active'"
+                                            :action="`/subscriptions/${subscription.id}/renew`"
+                                            method="post"
+                                            class="inline"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="text-sm text-primary hover:text-primary/80"
+                                            >
+                                                Renew
+                                            </button>
+                                        </form>
+                                        <form
+                                            v-if="subscription.status === 'active'"
+                                            :action="`/subscriptions/${subscription.id}/cancel`"
+                                            method="post"
+                                            class="inline"
+                                            @submit.prevent="(e) => {
+                                                if (confirm('Are you sure you want to cancel this subscription?')) {
+                                                    (e.target as HTMLFormElement).submit();
+                                                }
+                                            }"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="text-sm text-red-500 hover:text-red-600"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
