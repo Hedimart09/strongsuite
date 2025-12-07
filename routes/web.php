@@ -24,6 +24,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'store'])->name('subscriptions.store');
     Route::post('subscriptions/{subscription}/renew', [\App\Http\Controllers\SubscriptionController::class, 'renew'])->name('subscriptions.renew');
     Route::post('subscriptions/{subscription}/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+
+    Route::get('attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('attendance/scan', [\App\Http\Controllers\AttendanceController::class, 'scan'])->name('attendance.scan');
+    Route::post('attendance/check-in/qr', [\App\Http\Controllers\AttendanceController::class, 'checkInByQr'])->name('attendance.check-in.qr');
+    Route::get('attendance/manual', [\App\Http\Controllers\AttendanceController::class, 'manual'])->name('attendance.manual');
+    Route::post('attendance/check-in/manual', [\App\Http\Controllers\AttendanceController::class, 'checkInManual'])->name('attendance.check-in.manual');
+    Route::post('attendance/{attendance}/check-out', [\App\Http\Controllers\AttendanceController::class, 'checkOut'])->name('attendance.check-out');
 });
 
 require __DIR__.'/settings.php';

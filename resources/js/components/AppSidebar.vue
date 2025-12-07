@@ -14,9 +14,10 @@ import {
 import { dashboard } from '@/routes';
 import { index as membersIndex } from '@/routes/members';
 import { index as membershipPlansIndex } from '@/routes/membership-plans';
+import { index as attendanceIndex } from '@/routes/attendance';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, CreditCard, Folder, LayoutGrid, Users } from 'lucide-vue-next';
+import { BookOpen, ClipboardList, CreditCard, Folder, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -34,6 +35,11 @@ const mainNavItems: NavItem[] = [
         title: 'Membership Plans',
         href: membershipPlansIndex(),
         icon: CreditCard,
+    },
+    {
+        title: 'Attendance',
+        href: attendanceIndex(),
+        icon: ClipboardList,
     },
 ];
 

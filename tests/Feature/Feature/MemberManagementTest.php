@@ -119,6 +119,33 @@ it('can display member profile', function () {
         ->has('member'));
 });
 
+it('displays member profile with attendance history', function () {
+    $member = Member::factory()->create();
+
+    $attendance1 = \App\Models\Attendance::factory()->create([
+        'member_id' => $member->id,
+        'check_in_time' => now()->subHours(3),
+        'check_out_time' => now()->subHours(2),
+        'check_in_method' => 'qr_code',
+    ]);
+
+    $attendance2 = \App\Models\Attendance::factory()->create([
+        'member_id' => $member->id,
+        'check_in_time' => now()->subDay(),
+        'check_out_time' => null,
+        'check_in_method' => 'manual',
+    ]);
+
+    $response = $this->get("/members/{$member->id}");
+
+    $response->assertSuccessful();
+    $response->assertInertia(fn ($page) => $page
+        ->component('Members/Show')
+        ->has('member.attendances', 2)
+        ->where('member.attendances.0.check_in_method', 'qr_code')
+        ->where('member.attendances.1.check_in_method', 'manual'));
+});
+
 it('can display member edit page', function () {
     $member = Member::factory()->create();
 
