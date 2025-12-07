@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\GymSettings;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +13,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin User',
+            'email' => 'admin@strongsuite.com',
+        ]);
+
+        GymSettings::create([
+            'gym_name' => 'Strongsuite Fitness',
+            'email' => 'info@strongsuite.com',
+            'phone' => '+233 XX XXX XXXX',
+            'address' => 'Accra, Ghana',
+            'timezone' => 'Africa/Accra',
+            'currency' => 'GHS',
+            'language' => 'en',
+            'tax_rate' => 15.00,
+            'payment_gateways' => [],
+            'features' => [],
+        ]);
+
+        $this->call([
+            MembershipPlanSeeder::class,
+            MemberSeeder::class,
         ]);
     }
 }
