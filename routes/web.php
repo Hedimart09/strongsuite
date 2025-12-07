@@ -14,4 +14,9 @@ Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('members', \App\Http\Controllers\MemberController::class);
+    Route::get('members/{member}/qr-code', [\App\Http\Controllers\MemberController::class, 'qrCode'])->name('members.qr-code');
+});
+
 require __DIR__.'/settings.php';
