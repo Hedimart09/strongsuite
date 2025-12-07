@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Money\Currencies\ISOCurrencies;
+use Money\Currency;
+use Money\Formatter\IntlMoneyFormatter;
+use Money\Money;
 
 class MembershipPlan extends Model
 {
@@ -39,6 +43,21 @@ class MembershipPlan extends Model
     public function getFormattedPriceAttribute(): string
     {
         return number_format($this->price / 100, 2);
+    }
+
+    public function getMoney(): Money
+    {
+        return new Money($this->price, new Currency($this->currency));
+    }
+
+    public function getFormattedPrice(): string
+    {
+        $money = $this->getMoney();
+        $currencies = new ISOCurrencies;
+        $numberFormatter = new \NumberFormatter(config('app.locale', 'en_US'), \NumberFormatter::CURRENCY);
+        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+
+        return $moneyFormatter->format($money);
     }
 
     public function scopeActive($query)

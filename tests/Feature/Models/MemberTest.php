@@ -7,7 +7,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 
 test('can create a member', function () {
-    $member = Member::factory()->create();
+    $member = Member::factory()->active()->create();
 
     expect($member)->toBeInstanceOf(Member::class)
         ->and($member->member_id)->not->toBeNull()

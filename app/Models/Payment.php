@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Money\Currencies\ISOCurrencies;
+use Money\Currency;
+use Money\Formatter\IntlMoneyFormatter;
+use Money\Money;
 
 class Payment extends Model
 {
@@ -46,6 +50,21 @@ class Payment extends Model
     public function getFormattedAmountAttribute(): string
     {
         return number_format($this->amount / 100, 2);
+    }
+
+    public function getMoney(): Money
+    {
+        return new Money($this->amount, new Currency($this->currency));
+    }
+
+    public function getFormattedAmount(): string
+    {
+        $money = $this->getMoney();
+        $currencies = new ISOCurrencies;
+        $numberFormatter = new \NumberFormatter(config('app.locale', 'en_US'), \NumberFormatter::CURRENCY);
+        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+
+        return $moneyFormatter->format($money);
     }
 
     public function isCompleted(): bool
