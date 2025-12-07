@@ -22,7 +22,7 @@ class MemberController extends Controller
                 $q->latest()->limit(1);
             }]);
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -32,7 +32,7 @@ class MemberController extends Controller
             });
         }
 
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
         }
 

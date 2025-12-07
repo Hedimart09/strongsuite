@@ -44,10 +44,11 @@ const search = ref(props.filters.search || '');
 const status = ref(props.filters.status || '');
 
 watch([search, status], () => {
-    router.get('/members', {
-        search: search.value,
-        status: status.value,
-    }, {
+    const params: Record<string, string> = {};
+    if (search.value) params.search = search.value;
+    if (status.value) params.status = status.value;
+
+    router.get('/members', params, {
         preserveState: true,
         preserveScroll: true,
     });
