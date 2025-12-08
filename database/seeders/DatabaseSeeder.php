@@ -13,9 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@strongsuite.com',
+        // Seed roles and permissions first
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            AdminUserSeeder::class,
         ]);
 
         GymSettings::create([

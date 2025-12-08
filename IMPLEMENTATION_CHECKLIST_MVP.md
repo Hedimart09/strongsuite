@@ -72,22 +72,22 @@ This checklist tracks the implementation of the MVP for Strongsuite, a comprehen
 
 ## 💰 Section 6: Billing & Invoicing (6 tasks)
 
-- [ ] Create invoice generation system
-- [ ] Build payment receipt generation (PDF/email)
-- [ ] Create payment history page per member
-- [ ] Build payment processing page with gateway selection
-- [ ] Implement webhook handlers for payment confirmations
-- [ ] **Test Section 6**: Write and run billing tests
+- [x] Create invoice generation system
+- [x] Build payment receipt generation (PDF/email)
+- [x] Create payment history page per member
+- [x] Build payment processing page with gateway selection
+- [x] Implement webhook handlers for payment confirmations
+- [x] **Test Section 6**: Write and run billing tests ✅ **17 tests passed**
 
 ---
 
 ## 👨‍💼 Section 7: Staff Management & Permissions (5 tasks)
 
-- [ ] Create Staff roles and permissions system
-- [ ] Build Staff management CRUD pages
-- [ ] Implement role-based access control (RBAC) middleware
-- [ ] Assign appropriate permissions to admin, receptionist, trainer roles
-- [ ] **Test Section 7**: Write and run staff permission tests
+- [x] Create Staff roles and permissions system
+- [x] Build Staff management CRUD pages
+- [x] Implement role-based access control (RBAC) middleware
+- [x] Assign appropriate permissions to admin, receptionist, trainer roles
+- [x] **Test Section 7**: Write and run staff permission tests ✅ **24 tests passed**
 
 ---
 
@@ -139,9 +139,9 @@ After completing each section:
 ## Progress Tracking
 
 - **Total Tasks**: 61
-- **Completed**: 36 (Section 1: 8/8 ✅, Section 2: 9/9 ✅, Section 3: 7/7 ✅, Section 4: 5/5 ✅, Section 5: 7/7 ✅)
+- **Completed**: 47 (Section 1: 8/8 ✅, Section 2: 9/9 ✅, Section 3: 7/7 ✅, Section 4: 5/5 ✅, Section 5: 7/7 ✅, Section 6: 6/6 ✅, Section 7: 5/5 ✅)
 - **In Progress**: 0
-- **Remaining**: 25
+- **Remaining**: 14
 
 ---
 
@@ -184,5 +184,5 @@ After completing each section:
 
 ---
 
-**Last Updated**: 2025-12-07
-**Status**: Section 5 (Attendance & QR Code System) Complete - 36/61 tasks done (59.0%)
+**Last Updated**: 2025-12-08
+**Status**: Section 7 (Staff Management & Permissions) Complete - 47/61 tasks done (77.0%)

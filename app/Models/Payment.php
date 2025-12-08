@@ -18,6 +18,7 @@ class Payment extends Model
     protected $fillable = [
         'member_id',
         'subscription_id',
+        'invoice_id',
         'amount',
         'currency',
         'payment_method',
@@ -45,6 +46,11 @@ class Payment extends Model
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function getFormattedAmountAttribute(): string

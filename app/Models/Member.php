@@ -50,6 +50,11 @@ class Member extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
