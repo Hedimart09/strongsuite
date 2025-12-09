@@ -71,7 +71,11 @@ class StaffController extends Controller
         $staff->load('roles', 'permissions');
 
         return Inertia::render('Staff/Show', [
-            'staff' => $staff,
+            'staff' => array_merge($staff->toArray(), [
+                'all_permissions' => $staff->getAllPermissions()->map(function ($permission) {
+                    return ['name' => $permission->name];
+                })->values()->toArray(),
+            ]),
         ]);
     }
 

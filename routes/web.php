@@ -10,9 +10,13 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::get('reports', [\App\Http\Controllers\ReportsController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('reports');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Member routes
@@ -89,7 +93,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::middleware('permission:staff.edit')->group(function () {
         Route::get('staff/{staff}/edit', [\App\Http\Controllers\StaffController::class, 'edit'])->name('staff.edit');
-        Route::patch('staff/{staff}', [\App\Http\Controllers\StaffController::class, 'update'])->name('staff.update');
+        Route::match(['put', 'patch'], 'staff/{staff}', [\App\Http\Controllers\StaffController::class, 'update'])->name('staff.update');
     });
     Route::delete('staff/{staff}', [\App\Http\Controllers\StaffController::class, 'destroy'])->middleware('permission:staff.delete')->name('staff.destroy');
 });
