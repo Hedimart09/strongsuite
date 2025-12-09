@@ -18,6 +18,14 @@ Route::get('reports', [\App\Http\Controllers\ReportsController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('reports');
 
+Route::get('gym-settings', [\App\Http\Controllers\SettingsController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('settings.index');
+
+Route::match(['put', 'patch'], 'gym-settings', [\App\Http\Controllers\SettingsController::class, 'update'])
+    ->middleware(['auth', 'verified'])
+    ->name('settings.update');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Member routes
     Route::middleware('permission:members.create')->group(function () {

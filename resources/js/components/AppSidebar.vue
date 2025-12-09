@@ -18,9 +18,10 @@ import { index as attendanceIndex } from '@/routes/attendance';
 import { index as invoicesIndex } from '@/routes/invoices';
 import { index as staffIndex } from '@/routes/staff';
 import { reports } from '@/routes';
+import { index as settingsIndex } from '@/routes/settings';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BarChart3, BookOpen, ClipboardList, CreditCard, FileText, Folder, LayoutGrid, UserCog, Users } from 'lucide-vue-next';
+import { BarChart3, BookOpen, ClipboardList, CreditCard, FileText, Folder, LayoutGrid, Settings, UserCog, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -58,6 +59,11 @@ const mainNavItems: NavItem[] = [
         title: 'Staff',
         href: staffIndex(),
         icon: UserCog,
+    },
+    {
+        title: 'Settings',
+        href: settingsIndex(),
+        icon: Settings,
     },
 ];
 
