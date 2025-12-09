@@ -74,9 +74,17 @@ class ReportsController extends Controller
             });
 
         // Peak hours
+        $driver = DB::getDriverName();
+        $hourExpression = match ($driver) {
+            'sqlite' => "strftime('%H', check_in_time)",
+            'pgsql' => 'EXTRACT(HOUR FROM check_in_time)',
+            'mysql' => 'HOUR(check_in_time)',
+            default => 'HOUR(check_in_time)',
+        };
+
         $peakHours = Attendance::whereBetween('check_in_time', [$startDate, $endDate.' 23:59:59'])
             ->select(
-                DB::raw("strftime('%H', check_in_time) as hour"),
+                DB::raw("$hourExpression as hour"),
                 DB::raw('COUNT(*) as count')
             )
             ->groupBy('hour')
@@ -85,7 +93,7 @@ class ReportsController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'hour' => $item->hour.':00',
+                    'hour' => str_pad($item->hour, 2, '0', STR_PAD_LEFT).':00',
                     'count' => $item->count,
                 ];
             });

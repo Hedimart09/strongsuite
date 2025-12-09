@@ -72,7 +72,7 @@ const togglePaymentGateway = (gatewayId: string) => {
 };
 
 const submit = () => {
-    form.post('/gym-settings', {
+    form.put('/gym-settings', {
         forceFormData: true,
         preserveScroll: true,
     });

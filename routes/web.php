@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::middleware('permission:members.edit')->group(function () {
         Route::get('members/{member}/edit', [\App\Http\Controllers\MemberController::class, 'edit'])->name('members.edit');
-        Route::match(['put', 'patch'], 'members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
+        Route::match(['post', 'put', 'patch'], 'members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
     });
     Route::middleware('permission:members.view')->group(function () {
         Route::get('members', [\App\Http\Controllers\MemberController::class, 'index'])->name('members.index');

@@ -51,6 +51,7 @@ const form = useForm({
     emergency_contact_phone: props.member.emergency_contact_phone,
     status: props.member.status,
     photo: null as File | null,
+    _method: 'PUT',
 });
 
 const photoPreview = ref<string | null>(
@@ -70,10 +71,23 @@ const handlePhotoChange = (event: Event) => {
 };
 
 const submit = () => {
-    form.post(`/members/${props.member.id}`, {
+    // Create a copy of form data and remove photo if it's null
+    const formData = form.transform((data) => {
+        const transformed = { ...data };
+        if (!transformed.photo) {
+            delete transformed.photo;
+        }
+        return transformed;
+    });
+
+    formData.post(`/members/${props.member.id}`, {
+        forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
             // Redirect handled by controller
+        },
+        onError: (errors) => {
+            console.error('Validation errors:', errors);
         },
     });
 };

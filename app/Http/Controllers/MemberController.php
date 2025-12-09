@@ -83,7 +83,9 @@ class MemberController extends Controller
     public function edit(Member $member)
     {
         return Inertia::render('Members/Edit', [
-            'member' => $member,
+            'member' => array_merge($member->toArray(), [
+                'date_of_birth' => $member->date_of_birth?->format('Y-m-d'),
+            ]),
         ]);
     }
 
@@ -96,6 +98,9 @@ class MemberController extends Controller
                 Storage::disk('public')->delete($member->photo);
             }
             $data['photo'] = $request->file('photo')->store('members/photos', 'public');
+        } else {
+            // Remove photo from data if no new photo is uploaded
+            unset($data['photo']);
         }
 
         $member->update($data);

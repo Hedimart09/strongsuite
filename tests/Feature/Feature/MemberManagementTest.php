@@ -210,6 +210,43 @@ it('can update member with new photo', function () {
     Storage::disk('public')->assertExists($member->photo);
 });
 
+it('preserves existing photo when updating without new photo', function () {
+    Storage::fake('public');
+
+    // Create member with a photo
+    $originalPhoto = UploadedFile::fake()->image('original-photo.jpg');
+    $member = Member::factory()->create();
+
+    $member->update([
+        'photo' => $originalPhoto->store('members/photos', 'public'),
+    ]);
+
+    $originalPhotoPath = $member->photo;
+
+    // Update member without uploading new photo
+    $updateData = [
+        'name' => 'Updated Name',
+        'email' => $member->email,
+        'phone' => $member->phone,
+        'date_of_birth' => $member->date_of_birth,
+        'gender' => $member->gender,
+        'emergency_contact_name' => $member->emergency_contact_name,
+        'emergency_contact_phone' => $member->emergency_contact_phone,
+        'status' => $member->status,
+        '_method' => 'PUT',
+    ];
+
+    $response = $this->post("/members/{$member->id}", $updateData);
+
+    $response->assertRedirect();
+    $member->refresh();
+
+    // Photo should still exist and be the same
+    expect($member->photo)->toBe($originalPhotoPath);
+    expect($member->name)->toBe('Updated Name');
+    Storage::disk('public')->assertExists($member->photo);
+});
+
 it('can delete member', function () {
     $member = Member::factory()->create();
 
