@@ -1,3 +1,207 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# StrongSuite - Gym Management System
+
+This is a Laravel 12 + Inertia.js + Vue 3 application for managing gym operations including members, subscriptions, attendance, payments, and staff.
+
+## Development Commands
+
+### Setup
+```bash
+composer run setup           # Full setup: install deps, copy .env, generate key, migrate, build assets
+```
+
+### Development
+```bash
+composer run dev            # Start server, queue worker, and Vite dev server concurrently
+npm run dev                 # Vite dev server only
+php artisan serve           # Laravel server only (port 8000)
+```
+
+### Testing
+```bash
+php artisan test                              # Run all tests
+php artisan test tests/Feature/ExampleTest.php    # Run specific test file
+php artisan test --filter=testName           # Run tests matching name
+composer run test                             # Clear config and run all tests
+```
+
+### Code Quality
+```bash
+vendor/bin/pint --dirty     # Format only modified files (REQUIRED before committing)
+vendor/bin/pint             # Format all PHP files
+npm run lint                # Lint and fix JS/Vue files
+npm run format              # Format JS/Vue files with Prettier
+npm run format:check        # Check formatting without fixing
+```
+
+### Build
+```bash
+npm run build               # Build frontend assets for production
+npm run build:ssr           # Build with SSR support
+```
+
+## Application Architecture
+
+### Domain Model Structure
+
+The application is centered around gym member management with the following core entities:
+
+**Member** (app/Models/Member.php)
+- Central entity representing gym members
+- Has auto-generated `member_id` (MEM-XXXXXXXX) and `qr_code` (QR-XXXXXXXXXXXX)
+- Related to: subscriptions, payments, invoices, attendances
+- Status: active/inactive
+
+**MembershipPlan** (app/Models/MembershipPlan.php)
+- Defines subscription tiers (monthly, annual, etc.)
+- Stores price in minor units (cents/pesewas) for precision
+- Has `duration_in_days` field for calculating subscription end dates
+- Uses Money PHP library for multi-currency support
+- Can be active/inactive
+
+**Subscription** (app/Models/Subscription.php)
+- Links Member to MembershipPlan with date ranges
+- Status: active, expired, cancelled
+- Supports auto-renewal
+- End date calculated from plan duration
+
+**Payment** (app/Models/Payment.php)
+- Records financial transactions
+- Supports multiple gateways: Paystack, Flutterwave, Stripe, Manual
+- Stores amounts in minor units with currency
+- Status: pending, completed, failed, refunded
+- Can be linked to subscriptions and invoices
+
+**Invoice** (app/Models/Invoice.php)
+- Billing documents for members
+- Auto-generated invoice numbers (INV-XXXXXXXX)
+- Status: draft, sent, paid, overdue, cancelled
+- Supports PDF generation via DomPDF
+
+**Attendance** (app/Models/Attendance.php)
+- Check-in/check-out tracking
+- Two methods: QR code scanning or manual selection
+- Tracks duration automatically
+
+### Authorization System
+
+Uses **Spatie Laravel Permission** package for role-based access control:
+
+**Roles:**
+- Admin: Full access to all features
+- Receptionist: Front desk operations (members, subscriptions, payments, attendance)
+- Trainer: View-only access to members and attendance
+
+**Permission naming convention:** `{resource}.{action}` (e.g., `members.view`, `members.create`)
+
+**Critical for testing:** When writing tests that access protected routes, users MUST have appropriate permissions:
+```php
+beforeEach(function () {
+    $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+    $this->user = User::factory()->admin()->create();  // Creates user with Admin role
+    $this->actingAs($this->user);
+});
+```
+
+### Route Organization
+
+Routes in `routes/web.php` follow this pattern:
+- All routes require `auth` and `verified` middleware
+- Routes are grouped by permission middleware
+- **IMPORTANT:** Specific routes (e.g., `/create`, `/edit`) MUST come before parameterized routes (e.g., `/{id}`)
+- Routes accept both `PUT` and `PATCH` for updates using `Route::match(['put', 'patch'], ...)`
+
+Example:
+```php
+Route::middleware('permission:members.create')->group(function () {
+    Route::get('members/create', [MemberController::class, 'create']);  // BEFORE /{member}
+});
+Route::middleware('permission:members.view')->group(function () {
+    Route::get('members/{member}', [MemberController::class, 'show']);  // AFTER /create
+});
+```
+
+### Payment Gateway Architecture
+
+**PaymentService** (app/Services/PaymentService.php)
+- Central service for all payment operations
+- Manages multiple gateway implementations via interface
+- Gateway instances: PaystackGateway, FlutterwaveGateway, StripeGateway
+- Handles: initialization, verification, webhooks, manual payments
+- All payment operations wrapped in DB transactions
+
+**Payment Flow:**
+1. Initialize payment → creates pending Payment record
+2. User completes payment on gateway
+3. Webhook or manual verification → updates Payment to completed
+4. Transaction metadata stored for audit trail
+
+### Money Handling
+
+**Critical:** All monetary amounts are stored as integers in minor units (cents/pesewas):
+- Form input: 50.00 GHS → Database: 5000
+- Use Money PHP library for formatting and currency conversions
+- Models have `getMoney()` and `getFormattedPrice()`/`getFormattedAmount()` methods
+
+### Frontend Architecture
+
+**Stack:**
+- Vue 3 with Composition API
+- Inertia.js v2 for SPA-like experience without API
+- Tailwind CSS v4 for styling
+- Reka UI for component primitives
+- Lucide Vue for icons
+
+**Page Components:** Located in `resources/js/Pages/` following domain structure:
+- Members/Index.vue, Members/Show.vue, etc.
+- Attendance/Index.vue, Attendance/Scan.vue, etc.
+
+**Wayfinder Integration:** Type-safe route helpers generated from Laravel routes
+```typescript
+import { show, store } from '@/actions/App/Http/Controllers/MemberController'
+show(1) // { url: "/members/1", method: "get" }
+```
+
+### Database Schema Key Points
+
+- **members:** Stores member profiles with auto-generated IDs and QR codes
+- **membership_plans:** Subscription tier definitions with pricing
+- **subscriptions:** Time-boxed member-plan relationships
+- **payments:** Financial transaction records with gateway metadata
+- **invoices:** Billing documents with line items and totals
+- **attendances:** Check-in/out records with duration calculation
+- **permission_tables:** Spatie permissions (roles, permissions, model_has_roles, etc.)
+
+### Important Patterns
+
+**ID Generation:** Members get auto-generated unique IDs:
+- `member_id`: MEM-{8-digit-number}
+- `qr_code`: QR-{12-digit-number}
+- Invoice: `invoice_number`: INV-{8-digit-number}
+
+**Scope Methods:**
+- `MembershipPlan::active()` - Get only active plans
+- `Attendance::today()` - Get today's attendance records
+- `Member::active()` / `inactive()` - Filter by status
+
+**Factory States:** Models have useful factory states for testing:
+- `Member::factory()->active()` / `inactive()`
+- `MembershipPlan::factory()->active()` / `inactive()`
+- `Invoice::factory()->paid()` / `draft()` / `overdue()`
+- `User::factory()->admin()` - Creates admin with all permissions
+
+## Testing Guidelines
+
+- All tests use Pest syntax
+- Feature tests should seed roles/permissions before creating authenticated users
+- Use `admin()` factory state for tests requiring full access
+- Test both happy paths and validation failures
+- Use factories with states instead of manual model creation
+- Run tests after every change: `php artisan test --filter=relevantTest`
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

@@ -16,33 +16,33 @@ Route::get('dashboard', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Member routes
-    Route::middleware('permission:members.view')->group(function () {
-        Route::get('members', [\App\Http\Controllers\MemberController::class, 'index'])->name('members.index');
-        Route::get('members/{member}', [\App\Http\Controllers\MemberController::class, 'show'])->name('members.show');
-        Route::get('members/{member}/qr-code', [\App\Http\Controllers\MemberController::class, 'qrCode'])->name('members.qr-code');
-    });
     Route::middleware('permission:members.create')->group(function () {
         Route::get('members/create', [\App\Http\Controllers\MemberController::class, 'create'])->name('members.create');
         Route::post('members', [\App\Http\Controllers\MemberController::class, 'store'])->name('members.store');
     });
     Route::middleware('permission:members.edit')->group(function () {
         Route::get('members/{member}/edit', [\App\Http\Controllers\MemberController::class, 'edit'])->name('members.edit');
-        Route::patch('members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
+        Route::match(['put', 'patch'], 'members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
+    });
+    Route::middleware('permission:members.view')->group(function () {
+        Route::get('members', [\App\Http\Controllers\MemberController::class, 'index'])->name('members.index');
+        Route::get('members/{member}', [\App\Http\Controllers\MemberController::class, 'show'])->name('members.show');
+        Route::get('members/{member}/qr-code', [\App\Http\Controllers\MemberController::class, 'qrCode'])->name('members.qr-code');
     });
     Route::delete('members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->middleware('permission:members.delete')->name('members.destroy');
 
     // Membership Plan routes
-    Route::middleware('permission:membership-plans.view')->group(function () {
-        Route::get('membership-plans', [\App\Http\Controllers\MembershipPlanController::class, 'index'])->name('membership-plans.index');
-        Route::get('membership-plans/{membershipPlan}', [\App\Http\Controllers\MembershipPlanController::class, 'show'])->name('membership-plans.show');
-    });
     Route::middleware('permission:membership-plans.create')->group(function () {
         Route::get('membership-plans/create', [\App\Http\Controllers\MembershipPlanController::class, 'create'])->name('membership-plans.create');
         Route::post('membership-plans', [\App\Http\Controllers\MembershipPlanController::class, 'store'])->name('membership-plans.store');
     });
     Route::middleware('permission:membership-plans.edit')->group(function () {
         Route::get('membership-plans/{membershipPlan}/edit', [\App\Http\Controllers\MembershipPlanController::class, 'edit'])->name('membership-plans.edit');
-        Route::patch('membership-plans/{membershipPlan}', [\App\Http\Controllers\MembershipPlanController::class, 'update'])->name('membership-plans.update');
+        Route::match(['put', 'patch'], 'membership-plans/{membershipPlan}', [\App\Http\Controllers\MembershipPlanController::class, 'update'])->name('membership-plans.update');
+    });
+    Route::middleware('permission:membership-plans.view')->group(function () {
+        Route::get('membership-plans', [\App\Http\Controllers\MembershipPlanController::class, 'index'])->name('membership-plans.index');
+        Route::get('membership-plans/{membershipPlan}', [\App\Http\Controllers\MembershipPlanController::class, 'show'])->name('membership-plans.show');
     });
     Route::delete('membership-plans/{membershipPlan}', [\App\Http\Controllers\MembershipPlanController::class, 'destroy'])->middleware('permission:membership-plans.delete')->name('membership-plans.destroy');
 

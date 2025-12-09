@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+    $this->user = User::factory()->admin()->create();
     $this->actingAs($this->user);
     Storage::fake('public');
 });
