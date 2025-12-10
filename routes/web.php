@@ -22,7 +22,7 @@ Route::get('gym-settings', [\App\Http\Controllers\SettingsController::class, 'in
     ->middleware(['auth', 'verified'])
     ->name('settings.index');
 
-Route::match(['put', 'patch'], 'gym-settings', [\App\Http\Controllers\SettingsController::class, 'update'])
+Route::match(['post', 'put', 'patch'], 'gym-settings', [\App\Http\Controllers\SettingsController::class, 'update'])
     ->middleware(['auth', 'verified'])
     ->name('settings.update');
 

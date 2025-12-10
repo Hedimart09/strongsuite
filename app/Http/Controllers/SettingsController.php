@@ -47,6 +47,9 @@ class SettingsController extends Controller
 
             $path = $request->file('logo')->store('logos', 'public');
             $validated['logo'] = $path;
+        } else {
+            // Remove logo from data if no new logo is uploaded
+            unset($validated['logo']);
         }
 
         $settings->update($validated);

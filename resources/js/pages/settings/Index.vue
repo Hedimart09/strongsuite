@@ -44,6 +44,7 @@ const form = useForm({
     tax_rate: props.settings.tax_rate,
     payment_gateways: props.settings.payment_gateways || [],
     logo: null as File | null,
+    _method: 'PUT',
 });
 
 const logoPreview = ref<string | null>(
@@ -72,7 +73,16 @@ const togglePaymentGateway = (gatewayId: string) => {
 };
 
 const submit = () => {
-    form.put('/gym-settings', {
+    // Remove logo field if it's null to prevent overwriting existing logo
+    const formData = form.transform((data) => {
+        const transformed = { ...data };
+        if (!transformed.logo) {
+            delete transformed.logo;
+        }
+        return transformed;
+    });
+
+    formData.post('/gym-settings', {
         forceFormData: true,
         preserveScroll: true,
     });
