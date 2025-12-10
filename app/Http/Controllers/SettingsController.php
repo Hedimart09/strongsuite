@@ -13,7 +13,7 @@ class SettingsController extends Controller
     {
         $settings = GymSettings::get();
 
-        return Inertia::render('settings/Index', [
+        return Inertia::render('Settings/Index', [
             'settings' => $settings,
             'timezones' => $this->getTimezones(),
             'currencies' => $this->getCurrencies(),
