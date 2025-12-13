@@ -139,11 +139,11 @@ After completing each section:
 
 ## Progress Tracking
 
-- **Total Tasks**: 61
-- **Completed**: 60 (Section 1: 8/8 ✅, Section 2: 9/9 ✅, Section 3: 7/7 ✅, Section 4: 5/5 ✅, Section 5: 7/7 ✅, Section 6: 6/6 ✅, Section 7: 5/5 ✅, Section 8: 7/7 ✅, Section 9: 6/7 ✅, Section 10: 5/5 ✅)
+- **Total Tasks**: 76 (61 MVP + 15 Member Portal)
+- **Completed**: 74 (Section 1: 8/8 ✅, Section 2: 9/9 ✅, Section 3: 7/7 ✅, Section 4: 5/5 ✅, Section 5: 7/7 ✅, Section 6: 6/6 ✅, Section 7: 5/5 ✅, Section 8: 7/7 ✅, Section 9: 6/7 ✅, Section 10: 5/5 ✅, Section 11: 14/15 ✅)
 - **In Progress**: 0
-- **Remaining**: 1 (Multi-language support - intentionally skipped)
-- **Test Coverage**: 233 tests passing
+- **Remaining**: 2 (1 Multi-language + 1 Entrance QR code - both optional enhancements)
+- **Test Coverage**: 233 tests passing (MVP) + 17 tests passing (Member Portal) = **250 total tests passing**
 
 ---
 
@@ -186,8 +186,29 @@ After completing each section:
 
 ---
 
-**Last Updated**: 2025-12-10
-**Status**: 🎉 **MVP COMPLETE** 🎉 - All sections finished! 60/61 tasks done (98.4%) - 233 tests passing - Production ready!
+## 📱 Section 11: Member Self-Service Check-In Portal (15 tasks)
+
+- [x] Plan member authentication approach and database schema changes
+- [x] Add PIN field to members table via migration
+- [x] Create member authentication guard and middleware
+- [x] Create MemberAuthController for login/logout
+- [x] Create MemberCheckInController for self-service check-in
+- [x] Add member portal routes (login, dashboard, check-in)
+- [x] Create Member/Login.vue page with PIN authentication
+- [x] Create Member/Dashboard.vue showing subscription and attendance
+- [x] Create Member/CheckIn.vue mobile-optimized check-in page
+- [ ] Create GymSettingsController method to generate entrance QR code ⏭️ **Optional Enhancement**
+- [x] Update member creation to auto-generate PIN
+- [x] Add rate limiting to check-in endpoint to prevent abuse
+- [x] Write tests for member authentication flow
+- [x] Write tests for self-service check-in functionality
+- [x] Update documentation with member portal usage instructions
+- [x] **Test Section 11**: Write and run member portal tests ✅ **17 tests passing**
+
+---
+
+**Last Updated**: 2025-12-12
+**Status**: 🎉 **MEMBER PORTAL COMPLETE!** 🎉 - Section 11: 14/15 tasks done (93.3%) - 17 new tests passing
 
 ---
 

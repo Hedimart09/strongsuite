@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMemberRequest;
 use App\Http\Requests\UpdateMemberRequest;
+use App\Mail\MemberPinMail;
 use App\Models\Member;
+use App\Models\MemberPinToken;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class MemberController extends Controller
@@ -57,14 +62,32 @@ class MemberController extends Controller
         $data['qr_code'] = $this->generateQrCode();
         $data['status'] = 'active';
 
+        $pin = $this->generatePin();
+        $data['pin'] = Hash::make($pin);
+
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('members/photos', 'public');
         }
 
         $member = Member::create($data);
 
+        // Create PIN token that expires in 48 hours
+        $token = Str::random(64);
+        MemberPinToken::create([
+            'member_id' => $member->id,
+            'token' => $token,
+            'pin' => $pin,
+            'expires_at' => now()->addHours(48),
+        ]);
+
+        // Generate PIN URL
+        $pinUrl = route('member.pin.view', ['token' => $token]);
+
+        // Send email to member
+        Mail::to($member->email)->send(new MemberPinMail($member, $pinUrl));
+
         return redirect()->route('members.show', $member)
-            ->with('success', 'Member registered successfully');
+            ->with('success', 'Member registered successfully! A secure PIN link has been sent to '.$member->email);
     }
 
     public function show(Member $member)
@@ -158,5 +181,10 @@ class MemberController extends Controller
         } while (Member::where('qr_code', $qrCode)->exists());
 
         return $qrCode;
+    }
+
+    protected function generatePin(): string
+    {
+        return str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
     }
 }

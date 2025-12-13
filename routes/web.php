@@ -26,6 +26,22 @@ Route::match(['post', 'put', 'patch'], 'gym-settings', [\App\Http\Controllers\Se
     ->middleware(['auth', 'verified'])
     ->name('settings.update');
 
+// Member Portal routes
+Route::prefix('member')->name('member.')->group(function () {
+    Route::get('login', [\App\Http\Controllers\Member\MemberAuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [\App\Http\Controllers\Member\MemberAuthController::class, 'login']);
+    Route::post('logout', [\App\Http\Controllers\Member\MemberAuthController::class, 'logout'])->name('logout');
+
+    // Public PIN viewing route (no auth required)
+    Route::get('pin/{token}', [\App\Http\Controllers\Member\MemberPinController::class, 'show'])->name('pin.view');
+
+    Route::middleware('member.auth')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\Member\MemberDashboardController::class, 'index'])->name('dashboard');
+        Route::get('check-in', [\App\Http\Controllers\Member\MemberCheckInController::class, 'show'])->name('check-in');
+        Route::post('check-in', [\App\Http\Controllers\Member\MemberCheckInController::class, 'checkIn'])->name('check-in.store');
+    });
+});
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Member routes
     Route::middleware('permission:members.create')->group(function () {

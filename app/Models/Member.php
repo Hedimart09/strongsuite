@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Member extends Model
+class Member extends Model implements AuthenticatableContract
 {
     /** @use HasFactory<\Database\Factories\MemberFactory> */
-    use HasFactory;
+    use Authenticatable, HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -25,7 +27,12 @@ class Member extends Model
         'emergency_contact_name',
         'emergency_contact_phone',
         'qr_code',
+        'pin',
         'status',
+    ];
+
+    protected $hidden = [
+        'pin',
     ];
 
     protected function casts(): array
@@ -69,5 +76,10 @@ class Member extends Model
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->pin;
     }
 }
