@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
+import RecordManualPaymentModal from '@/components/RecordManualPaymentModal.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { CreditCard, Search, Filter } from 'lucide-vue-next';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { CreditCard, Search, Filter, Plus } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 interface Payment {
@@ -51,6 +52,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Payments', href: '/payments' },
@@ -61,6 +63,12 @@ const status = ref(props.filters.status || '');
 const paymentMethod = ref(props.filters.payment_method || '');
 const startDate = ref(props.filters.start_date || '');
 const endDate = ref(props.filters.end_date || '');
+const showManualPaymentModal = ref(false);
+
+const canRecordManualPayment = () => {
+    const userPermissions = page.props.auth?.user?.permissions || [];
+    return userPermissions.includes('payments.create');
+};
 
 watch([search, status, paymentMethod, startDate, endDate], () => {
     const params: Record<string, string> = {};
@@ -130,6 +138,14 @@ const getMethodBadgeClass = (method: string) => {
                     </p>
                 </div>
                 <div class="flex gap-3">
+                    <button
+                        v-if="canRecordManualPayment()"
+                        @click="showManualPaymentModal = true"
+                        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                    >
+                        <Plus class="h-4 w-4" />
+                        Record Payment
+                    </button>
                     <Link
                         href="/finance"
                         class="inline-flex items-center gap-2 rounded-lg border border-sidebar-border/70 px-4 py-2 text-sm font-medium hover:bg-accent"
@@ -341,5 +357,8 @@ const getMethodBadgeClass = (method: string) => {
                 </div>
             </div>
         </div>
+
+        <!-- Record Manual Payment Modal -->
+        <RecordManualPaymentModal v-model:open="showManualPaymentModal" />
     </AppLayout>
 </template>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\GymSettings;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -37,14 +38,23 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+        $gymSettings = GymSettings::first();
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    ...$request->user()->toArray(),
+                    'roles' => $request->user()->getRoleNames(),
+                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                ] : null,
             ],
+            'gymSettings' => $gymSettings ? [
+                'gym_name' => $gymSettings->gym_name,
+                'logo' => $gymSettings->logo,
+            ] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'success' => $request->session()->get('success'),

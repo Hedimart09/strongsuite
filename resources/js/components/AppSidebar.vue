@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import NavFooter from '@/components/NavFooter.vue';
-import NavMain from '@/components/NavMain.vue';
+import NavMainGrouped from '@/components/NavMainGrouped.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
     Sidebar,
@@ -16,67 +15,107 @@ import { index as membersIndex } from '@/routes/members';
 import { index as membershipPlansIndex } from '@/routes/membership-plans';
 import { index as attendanceIndex } from '@/routes/attendance';
 import { index as invoicesIndex } from '@/routes/invoices';
+import { index as paymentsIndex } from '@/routes/payments';
+import { index as financeIndex } from '@/routes/finance';
 import { index as staffIndex } from '@/routes/staff';
 import { reports } from '@/routes';
 import { index as settingsIndex } from '@/routes/settings';
-import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BarChart3, BookOpen, ClipboardList, CreditCard, FileText, Folder, LayoutGrid, Settings, UserCog, Users } from 'lucide-vue-next';
+import { BarChart3, ClipboardList, CreditCard, DollarSign, FileText, LayoutGrid, Settings, UserCog, Users, Wallet } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
+import type { Component } from 'vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Members',
-        href: membersIndex(),
-        icon: Users,
-    },
-    {
-        title: 'Membership Plans',
-        href: membershipPlansIndex(),
-        icon: CreditCard,
-    },
-    {
-        title: 'Attendance',
-        href: attendanceIndex(),
-        icon: ClipboardList,
-    },
-    {
-        title: 'Invoices',
-        href: invoicesIndex(),
-        icon: FileText,
-    },
-    {
-        title: 'Reports',
-        href: reports(),
-        icon: BarChart3,
-    },
-    {
-        title: 'Staff',
-        href: staffIndex(),
-        icon: UserCog,
-    },
-    {
-        title: 'Settings',
-        href: settingsIndex(),
-        icon: Settings,
-    },
-];
+interface NavSubItem {
+    title: string;
+    href: string;
+}
 
-const footerNavItems: NavItem[] = [
+interface NavItemWithSub {
+    title: string;
+    href?: string;
+    icon: Component;
+    items?: NavSubItem[];
+}
+
+interface NavGroup {
+    label: string;
+    items: NavItemWithSub[];
+}
+
+const navGroups: NavGroup[] = [
     {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
+        label: 'Core Operations',
+        items: [
+            {
+                title: 'Dashboard',
+                href: dashboard(),
+                icon: LayoutGrid,
+            },
+            {
+                title: 'Attendance',
+                href: attendanceIndex(),
+                icon: ClipboardList,
+            },
+        ],
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
+        label: 'Member Management',
+        items: [
+            {
+                title: 'Members',
+                href: membersIndex(),
+                icon: Users,
+            },
+            {
+                title: 'Membership Plans',
+                href: membershipPlansIndex(),
+                icon: CreditCard,
+            },
+        ],
+    },
+    {
+        label: 'Financial',
+        items: [
+            {
+                title: 'Invoices',
+                href: invoicesIndex(),
+                icon: FileText,
+            },
+            {
+                title: 'Payments',
+                href: paymentsIndex(),
+                icon: Wallet,
+            },
+            {
+                title: 'Finance',
+                icon: DollarSign,
+                items: [
+                    {
+                        title: 'Overview',
+                        href: financeIndex(),
+                    },
+                    {
+                        title: 'Reports',
+                        href: reports(),
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'System',
+        items: [
+            {
+                title: 'Staff',
+                href: staffIndex(),
+                icon: UserCog,
+            },
+            {
+                title: 'Settings',
+                href: settingsIndex(),
+                icon: Settings,
+            },
+        ],
     },
 ];
 </script>
@@ -96,11 +135,10 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMainGrouped :groups="navGroups" />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>

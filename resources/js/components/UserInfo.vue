@@ -7,10 +7,12 @@ import { computed } from 'vue';
 interface Props {
     user: User;
     showEmail?: boolean;
+    showRole?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showEmail: false,
+    showRole: false,
 });
 
 const { getInitials } = useInitials();
@@ -19,6 +21,13 @@ const { getInitials } = useInitials();
 const showAvatar = computed(
     () => props.user.avatar && props.user.avatar !== '',
 );
+
+// Get the first role (primary role)
+const primaryRole = computed(() => {
+    return props.user.roles && props.user.roles.length > 0
+        ? props.user.roles[0]
+        : null;
+});
 </script>
 
 <template>
@@ -34,5 +43,8 @@ const showAvatar = computed(
         <span v-if="showEmail" class="truncate text-xs text-muted-foreground">{{
             user.email
         }}</span>
+        <span v-if="showRole && primaryRole" class="truncate text-xs text-muted-foreground">
+            {{ primaryRole }}
+        </span>
     </div>
 </template>

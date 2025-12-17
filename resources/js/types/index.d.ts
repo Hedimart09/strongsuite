@@ -17,12 +17,18 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface GymSettings {
+    gym_name: string;
+    logo: string | null;
+}
+
 export type AppPageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    gymSettings: GymSettings | null;
     sidebarOpen: boolean;
 };
 
@@ -34,6 +40,8 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    roles?: string[];
+    permissions?: string[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

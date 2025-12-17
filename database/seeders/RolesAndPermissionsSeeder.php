@@ -53,9 +53,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Report permissions
             'reports.view',
+            'reports.export',
 
             // Finance permissions
             'finance.view',
+            'finance.manage',
+
+            // Additional payment permissions
+            'payments.refund',
 
             // Settings permissions
             'settings.view',
@@ -68,21 +73,21 @@ class RolesAndPermissionsSeeder extends Seeder
             'staff.delete',
         ];
 
-        // Create permissions
+        // Create permissions (use firstOrCreate to avoid duplicates)
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles and assign permissions
-        $adminRole = Role::create(['name' => 'Admin']);
-        $receptionistRole = Role::create(['name' => 'Receptionist']);
-        $trainerRole = Role::create(['name' => 'Trainer']);
+        // Create roles and assign permissions (use firstOrCreate to avoid duplicates)
+        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
+        $receptionistRole = Role::firstOrCreate(['name' => 'Receptionist']);
+        $trainerRole = Role::firstOrCreate(['name' => 'Trainer']);
 
-        // Admin gets all permissions
-        $adminRole->givePermissionTo(Permission::all());
+        // Admin gets all permissions (sync to update existing role)
+        $adminRole->syncPermissions(Permission::all());
 
         // Receptionist permissions (limited to front desk operations)
-        $receptionistRole->givePermissionTo([
+        $receptionistRole->syncPermissions([
             'members.view',
             'members.create',
             'members.edit',
@@ -103,7 +108,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         // Trainer permissions (view-only and attendance management)
-        $trainerRole->givePermissionTo([
+        $trainerRole->syncPermissions([
             'members.view',
             'attendance.view',
             'attendance.create',
