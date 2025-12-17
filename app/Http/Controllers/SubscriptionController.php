@@ -6,6 +6,8 @@ use App\Http\Requests\StoreSubscriptionRequest;
 use App\Models\Member;
 use App\Models\MembershipPlan;
 use App\Models\Subscription;
+use App\Services\InvoiceService;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class SubscriptionController extends Controller
@@ -22,24 +24,34 @@ class SubscriptionController extends Controller
 
     public function store(StoreSubscriptionRequest $request)
     {
-        $data = $request->validated();
+        $subscription = DB::transaction(function () use ($request) {
+            $data = $request->validated();
 
-        $plan = MembershipPlan::findOrFail($data['membership_plan_id']);
+            $plan = MembershipPlan::findOrFail($data['membership_plan_id']);
 
-        $startDate = $data['start_date'];
-        $endDate = now()->parse($startDate)->addDays($plan->duration_in_days);
+            $startDate = $data['start_date'];
+            $endDate = now()->parse($startDate)->addDays($plan->duration_in_days);
 
-        $subscription = Subscription::create([
-            'member_id' => $data['member_id'],
-            'membership_plan_id' => $data['membership_plan_id'],
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'status' => 'active',
-            'auto_renew' => $data['auto_renew'] ?? false,
-        ]);
+            // Create subscription with pending_payment status
+            $subscription = Subscription::create([
+                'member_id' => $data['member_id'],
+                'membership_plan_id' => $data['membership_plan_id'],
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'status' => 'pending_payment',  // Pay-first: start as pending
+                'auto_renew' => $data['auto_renew'] ?? false,
+            ]);
 
-        return redirect()->route('members.show', $subscription->member_id)
-            ->with('success', 'Subscription created successfully');
+            // Auto-generate invoice
+            $invoiceService = app(InvoiceService::class);
+            $invoiceService->generateInvoiceForSubscription($subscription);
+
+            return $subscription;
+        });
+
+        // Redirect to payment selection page
+        return redirect()->route('subscriptions.payment', $subscription->id)
+            ->with('success', 'Subscription created. Please complete payment to activate.');
     }
 
     public function renew(Subscription $subscription)

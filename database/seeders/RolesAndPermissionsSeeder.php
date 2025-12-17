@@ -54,6 +54,9 @@ class RolesAndPermissionsSeeder extends Seeder
             // Report permissions
             'reports.view',
 
+            // Finance permissions
+            'finance.view',
+
             // Settings permissions
             'settings.view',
             'settings.edit',
@@ -96,6 +99,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'attendance.view',
             'attendance.create',
             'reports.view',
+            'finance.view',
         ]);
 
         // Trainer permissions (view-only and attendance management)

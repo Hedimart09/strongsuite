@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\Member;
+use App\Services\InvoiceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class InvoiceController extends Controller
@@ -45,6 +48,70 @@ class InvoiceController extends Controller
         return Inertia::render('Invoices/Show', [
             'invoice' => $invoice,
         ]);
+    }
+
+    public function create(Request $request)
+    {
+        $members = Member::active()->get();
+        $memberId = $request->query('member_id');
+
+        return Inertia::render('Invoices/Create', [
+            'members' => $members,
+            'selected_member_id' => $memberId ? (int) $memberId : null,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'member_id' => ['required', 'exists:members,id'],
+            'subscription_id' => ['nullable', 'exists:subscriptions,id'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.description' => ['required', 'string', 'max:255'],
+            'items.*.amount' => ['required', 'integer', 'min:0'],
+            'tax_rate' => ['sometimes', 'numeric', 'min:0', 'max:100'],
+            'due_date' => ['required', 'date'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $invoice = DB::transaction(function () use ($validated) {
+            $invoiceService = app(InvoiceService::class);
+
+            // Calculate amounts
+            $subtotal = collect($validated['items'])->sum('amount');
+            $taxRate = $validated['tax_rate'] ?? 0;
+            $taxAmount = (int) ($subtotal * ($taxRate / 100));
+            $totalAmount = $subtotal + $taxAmount;
+
+            // Generate unique invoice number
+            do {
+                $number = 'INV-'.str_pad((string) random_int(1, 99999999), 8, '0', STR_PAD_LEFT);
+            } while (Invoice::where('invoice_number', $number)->exists());
+
+            $invoice = Invoice::create([
+                'invoice_number' => $number,
+                'member_id' => $validated['member_id'],
+                'subscription_id' => $validated['subscription_id'] ?? null,
+                'subtotal' => $subtotal,
+                'tax_amount' => $taxAmount,
+                'total_amount' => $totalAmount,
+                'currency' => 'GHS',
+                'issue_date' => now(),
+                'due_date' => $validated['due_date'],
+                'status' => 'sent',
+                'notes' => $validated['notes'] ?? null,
+                'metadata' => [
+                    'items' => $validated['items'],
+                    'tax_rate' => $taxRate,
+                    'created_by' => auth()->id(),
+                ],
+            ]);
+
+            return $invoice;
+        });
+
+        return redirect()->route('invoices.show', $invoice)
+            ->with('success', 'Invoice created successfully');
     }
 
     public function downloadPdf(Invoice $invoice)

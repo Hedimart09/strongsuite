@@ -18,6 +18,10 @@ Route::get('reports', [\App\Http\Controllers\ReportsController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('reports');
 
+Route::get('finance', [\App\Http\Controllers\FinanceController::class, 'index'])
+    ->middleware(['auth', 'verified', 'permission:finance.view'])
+    ->name('finance.index');
+
 Route::get('gym-settings', [\App\Http\Controllers\SettingsController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('settings.index');
@@ -84,6 +88,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('subscriptions/{subscription}/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
     });
 
+    // Subscription Payment routes
+    Route::middleware('permission:subscriptions.view')->group(function () {
+        Route::get('subscriptions/{subscription}/payment', [\App\Http\Controllers\SubscriptionPaymentController::class, 'show'])->name('subscriptions.payment');
+    });
+    Route::middleware('permission:payments.create')->group(function () {
+        Route::post('subscriptions/{subscription}/payment/online', [\App\Http\Controllers\SubscriptionPaymentController::class, 'processOnline'])->name('subscriptions.payment.online');
+        Route::post('subscriptions/{subscription}/payment/manual', [\App\Http\Controllers\SubscriptionPaymentController::class, 'processManual'])->name('subscriptions.payment.manual');
+    });
+
+    // Payment routes
+    Route::middleware('permission:payments.view')->group(function () {
+        Route::get('payments', [\App\Http\Controllers\PaymentController::class, 'index'])->name('payments.index');
+        Route::get('payments/{payment}', [\App\Http\Controllers\PaymentController::class, 'show'])->name('payments.show');
+    });
+    Route::middleware('permission:payments.create')->group(function () {
+        Route::post('payments/initialize', [\App\Http\Controllers\PaymentController::class, 'initialize'])->name('payments.initialize');
+        Route::post('payments/manual', [\App\Http\Controllers\PaymentController::class, 'recordManual'])->name('payments.manual');
+    });
+
+    // Public payment verification and result pages (no permission required)
+    Route::get('payments/verify/{gateway}', [\App\Http\Controllers\PaymentController::class, 'verify'])->name('payments.verify');
+    Route::get('payments/{payment}/success', [\App\Http\Controllers\PaymentController::class, 'success'])->name('payments.success');
+    Route::get('payments/failed', [\App\Http\Controllers\PaymentController::class, 'failed'])->name('payments.failed');
+
     // Attendance routes
     Route::middleware('permission:attendance.view')->group(function () {
         Route::get('attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
@@ -97,6 +125,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Invoice routes
+    Route::middleware('permission:invoices.create')->group(function () {
+        Route::get('invoices/create', [\App\Http\Controllers\InvoiceController::class, 'create'])->name('invoices.create');
+        Route::post('invoices', [\App\Http\Controllers\InvoiceController::class, 'store'])->name('invoices.store');
+    });
     Route::middleware('permission:invoices.view')->group(function () {
         Route::get('invoices', [\App\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('invoices/{invoice}', [\App\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show');
@@ -121,5 +153,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::delete('staff/{staff}', [\App\Http\Controllers\StaffController::class, 'destroy'])->middleware('permission:staff.delete')->name('staff.destroy');
 });
+
+// Webhook routes (outside auth middleware, CSRF will be exempted)
+Route::post('webhooks/{gateway}/payment', [\App\Http\Controllers\PaymentController::class, 'webhook'])->name('webhooks.payment');
 
 require __DIR__.'/settings.php';

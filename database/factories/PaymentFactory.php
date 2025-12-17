@@ -48,4 +48,24 @@ class PaymentFactory extends Factory
             'payment_date' => null,
         ]);
     }
+
+    public function failed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'failed',
+            'payment_date' => null,
+        ]);
+    }
+
+    public function refunded(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'refunded',
+            'payment_date' => now()->subDays(fake()->numberBetween(1, 30)),
+            'metadata' => [
+                'refunded_at' => now()->toIso8601String(),
+                'refund_reason' => fake()->sentence(),
+            ],
+        ]);
+    }
 }

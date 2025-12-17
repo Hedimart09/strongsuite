@@ -78,6 +78,16 @@ class Member extends Model implements AuthenticatableContract
         return $this->status === 'active';
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status', 'inactive');
+    }
+
     public function getAuthPassword(): string
     {
         return $this->pin;

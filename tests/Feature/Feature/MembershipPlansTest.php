@@ -196,11 +196,13 @@ it('can create a subscription', function () {
 
     $response = $this->post('/subscriptions', $subscriptionData);
 
-    $response->assertRedirect("/members/{$member->id}");
+    // Should redirect to payment page with pending_payment status (pay-first flow)
+    $subscription = Subscription::where('member_id', $member->id)->first();
+    $response->assertRedirect("/subscriptions/{$subscription->id}/payment");
     $this->assertDatabaseHas('subscriptions', [
         'member_id' => $member->id,
         'membership_plan_id' => $plan->id,
-        'status' => 'active',
+        'status' => 'pending_payment',
     ]);
 });
 

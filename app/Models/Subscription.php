@@ -20,6 +20,7 @@ class Subscription extends Model
         'status',
         'auto_renew',
         'cancelled_at',
+        'metadata',
     ];
 
     protected function casts(): array
@@ -29,6 +30,7 @@ class Subscription extends Model
             'end_date' => 'date',
             'auto_renew' => 'boolean',
             'cancelled_at' => 'datetime',
+            'metadata' => 'array',
         ];
     }
 
@@ -45,6 +47,11 @@ class Subscription extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     public function isActive(): bool
