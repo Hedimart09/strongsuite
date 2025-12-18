@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import { useSidebar } from '@/components/ui/sidebar/utils';
+
+const { state } = useSidebar();
 </script>
 
 <template>
-    <div
-        class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
-    >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
-    </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="truncate leading-tight font-semibold"
-            >StrongSuite</span
-        >
-        <span class="truncate text-xs text-muted-foreground"
-            >Gym Management</span
-        >
+    <div class="flex items-center">
+        <!-- Show logomark when sidebar is collapsed -->
+        <div v-if="state === 'collapsed'">
+            <AppLogoIcon class="size-8" />
+        </div>
+
+        <!-- Show full logo when sidebar is expanded -->
+        <div v-else>
+            <img
+                src="/images/logo/strongsuite_logo.png"
+                alt="StrongSuite"
+                class="h-8 object-contain dark:hidden"
+            />
+            <img
+                src="/images/logo/strongsuite_white.png"
+                alt="StrongSuite"
+                class="hidden h-8 object-contain dark:block"
+            />
+        </div>
     </div>
 </template>
