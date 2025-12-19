@@ -3,7 +3,10 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
-import { Users, UserCheck, DollarSign, TrendingUp, Calendar, AlertCircle } from 'lucide-vue-next';
+import { Users, UserCheck, DollarSign, TrendingUp, Calendar, AlertCircle, UserPlus, QrCode, FileText, Activity, ArrowUpRight } from 'lucide-vue-next';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Metrics {
     active_members: number;
@@ -74,144 +77,147 @@ const formatDate = (dateString: string) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
             <!-- Page Header -->
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
-                <p class="text-sm text-muted-foreground mt-1">
-                    Welcome back! Here's what's happening with your gym today.
-                </p>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+                    <p class="text-muted-foreground mt-1">
+                        Welcome back! Here's what's happening with your gym today.
+                    </p>
+                </div>
             </div>
 
             <!-- Key Metrics -->
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <!-- Active Members -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-muted-foreground">Active Members</p>
-                            <p class="text-2xl font-bold mt-2">{{ metrics.active_members }}</p>
-                            <p class="text-xs text-muted-foreground mt-1">
-                                of {{ metrics.total_members }} total
-                            </p>
-                        </div>
-                        <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
-                            <Users class="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                    </div>
-                </div>
+                <Card>
+                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle class="text-sm font-medium">
+                            Active Members
+                        </CardTitle>
+                        <Users class="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div class="text-2xl font-bold">{{ metrics.active_members }}</div>
+                        <p class="text-xs text-muted-foreground">
+                            of {{ metrics.total_members }} total members
+                        </p>
+                    </CardContent>
+                </Card>
 
                 <!-- Today's Check-ins -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-muted-foreground">Today's Check-ins</p>
-                            <p class="text-2xl font-bold mt-2">{{ metrics.today_check_ins }}</p>
-                            <p class="text-xs text-muted-foreground mt-1">
-                                {{ metrics.month_check_ins }} this month
-                            </p>
-                        </div>
-                        <div class="rounded-full bg-green-100 p-3 dark:bg-green-900/20">
-                            <UserCheck class="h-6 w-6 text-green-600 dark:text-green-400" />
-                        </div>
-                    </div>
-                </div>
+                <Card>
+                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle class="text-sm font-medium">
+                            Today's Check-ins
+                        </CardTitle>
+                        <Activity class="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div class="text-2xl font-bold">{{ metrics.today_check_ins }}</div>
+                        <p class="text-xs text-muted-foreground">
+                            {{ metrics.month_check_ins }} this month
+                        </p>
+                    </CardContent>
+                </Card>
 
                 <!-- Today's Revenue -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-muted-foreground">Today's Revenue</p>
-                            <p class="text-2xl font-bold mt-2">{{ formatCurrency(metrics.today_revenue) }}</p>
-                            <p class="text-xs text-muted-foreground mt-1">
-                                {{ formatCurrency(metrics.month_revenue) }} this month
-                            </p>
-                        </div>
-                        <div class="rounded-full bg-emerald-100 p-3 dark:bg-emerald-900/20">
-                            <DollarSign class="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                    </div>
-                </div>
+                <Card>
+                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle class="text-sm font-medium">
+                            Today's Revenue
+                        </CardTitle>
+                        <DollarSign class="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div class="text-2xl font-bold">{{ formatCurrency(metrics.today_revenue) }}</div>
+                        <p class="text-xs text-muted-foreground">
+                            {{ formatCurrency(metrics.month_revenue) }} this month
+                        </p>
+                    </CardContent>
+                </Card>
 
                 <!-- Active Subscriptions -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-muted-foreground">Active Subscriptions</p>
-                            <p class="text-2xl font-bold mt-2">{{ metrics.active_subscriptions }}</p>
-                            <p v-if="metrics.expiring_soon > 0" class="text-xs text-orange-600 dark:text-orange-400 mt-1 flex items-center gap-1">
-                                <AlertCircle class="h-3 w-3" />
-                                {{ metrics.expiring_soon }} expiring soon
-                            </p>
-                            <p v-else class="text-xs text-muted-foreground mt-1">
-                                All good
-                            </p>
-                        </div>
-                        <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900/20">
-                            <Calendar class="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                        </div>
-                    </div>
-                </div>
+                <Card>
+                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle class="text-sm font-medium">
+                            Active Subscriptions
+                        </CardTitle>
+                        <Calendar class="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div class="text-2xl font-bold">{{ metrics.active_subscriptions }}</div>
+                        <p v-if="metrics.expiring_soon > 0" class="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                            <AlertCircle class="h-3 w-3" />
+                            {{ metrics.expiring_soon }} expiring soon
+                        </p>
+                        <p v-else class="text-xs text-muted-foreground">
+                            All subscriptions active
+                        </p>
+                    </CardContent>
+                </Card>
             </div>
 
             <div class="grid gap-6 lg:grid-cols-2">
                 <!-- Recent Members -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
-                    <div class="border-b border-sidebar-border/50 px-6 py-4">
-                        <h2 class="text-lg font-semibold">Recent Members</h2>
-                        <p class="text-sm text-muted-foreground">Latest member registrations</p>
-                    </div>
-                    <div class="p-6">
-                        <div v-if="recent_members.length > 0" class="space-y-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Recent Members</CardTitle>
+                        <CardDescription>Latest member registrations</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div v-if="recent_members.length > 0" class="space-y-6">
                             <div
                                 v-for="member in recent_members.slice(0, 5)"
                                 :key="member.id"
                                 class="flex items-center justify-between"
                             >
-                                <div class="flex-1">
-                                    <Link
-                                        :href="`/members/${member.id}`"
-                                        class="font-medium hover:text-primary"
-                                    >
-                                        {{ member.name }}
-                                    </Link>
-                                    <p class="text-sm text-muted-foreground">{{ member.member_id }}</p>
+                                <div class="flex items-center gap-3 flex-1">
+                                    <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <span class="text-sm font-semibold text-primary">
+                                            {{ member.name.charAt(0).toUpperCase() }}
+                                        </span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <Link
+                                            :href="`/members/${member.id}`"
+                                            class="font-medium hover:text-primary transition-colors"
+                                        >
+                                            {{ member.name }}
+                                        </Link>
+                                        <p class="text-sm text-muted-foreground">{{ member.member_id }}</p>
+                                    </div>
                                 </div>
                                 <div class="text-right">
-                                    <span
-                                        :class="[
-                                            member.status === 'active'
-                                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-                                        ]"
-                                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize"
-                                    >
+                                    <Badge :variant="member.status === 'active' ? 'default' : 'secondary'">
                                         {{ member.status }}
-                                    </span>
+                                    </Badge>
                                     <p class="text-xs text-muted-foreground mt-1">
                                         {{ formatDate(member.created_at) }}
                                     </p>
                                 </div>
                             </div>
-                            <Link
-                                href="/members"
-                                class="block text-center text-sm text-primary hover:text-primary/80 pt-4 border-t border-sidebar-border/50"
-                            >
-                                View all members →
-                            </Link>
+                            <Button as-child variant="ghost" class="w-full">
+                                <Link href="/members" class="flex items-center gap-2">
+                                    View all members
+                                    <ArrowUpRight class="h-4 w-4" />
+                                </Link>
+                            </Button>
                         </div>
                         <div v-else class="text-center py-8 text-muted-foreground">
-                            No members registered yet
+                            <Users class="h-12 w-12 mx-auto mb-2 opacity-20" />
+                            <p>No members registered yet</p>
                         </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
 
-                <!-- Revenue Chart (Simple List View) -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
-                    <div class="border-b border-sidebar-border/50 px-6 py-4">
-                        <h2 class="text-lg font-semibold">Revenue (Last 7 Days)</h2>
-                        <p class="text-sm text-muted-foreground">Daily revenue overview</p>
-                    </div>
-                    <div class="p-6">
-                        <div class="space-y-3">
+                <!-- Revenue Chart -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Revenue Overview</CardTitle>
+                        <CardDescription>Last 7 days</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="space-y-4">
                             <div
                                 v-for="(amount, index) in charts.revenue_by_day.data"
                                 :key="index"
@@ -220,20 +226,28 @@ const formatDate = (dateString: string) => {
                                 <span class="text-sm text-muted-foreground">
                                     {{ new Date(charts.revenue_by_day.labels[index]).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) }}
                                 </span>
-                                <span class="font-medium">{{ formatCurrency(amount) }}</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="h-2 w-24 rounded-full bg-muted overflow-hidden">
+                                        <div
+                                            class="h-full bg-primary rounded-full transition-all"
+                                            :style="{ width: `${(amount / Math.max(...charts.revenue_by_day.data)) * 100}%` }"
+                                        />
+                                    </div>
+                                    <span class="font-medium w-20 text-right">{{ formatCurrency(amount) }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
 
-                <!-- Check-ins Chart (Simple List View) -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
-                    <div class="border-b border-sidebar-border/50 px-6 py-4">
-                        <h2 class="text-lg font-semibold">Check-ins (Last 7 Days)</h2>
-                        <p class="text-sm text-muted-foreground">Daily check-in trends</p>
-                    </div>
-                    <div class="p-6">
-                        <div class="space-y-3">
+                <!-- Check-ins Chart -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Attendance Trends</CardTitle>
+                        <CardDescription>Last 7 days check-ins</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="space-y-4">
                             <div
                                 v-for="(count, index) in charts.check_ins_by_day.data"
                                 :key="index"
@@ -243,53 +257,72 @@ const formatDate = (dateString: string) => {
                                     {{ new Date(charts.check_ins_by_day.labels[index]).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) }}
                                 </span>
                                 <div class="flex items-center gap-3">
-                                    <div class="h-2 rounded-full bg-blue-200 dark:bg-blue-900" :style="{ width: `${Math.max(count / Math.max(...charts.check_ins_by_day.data) * 100, 5)}px` }" />
-                                    <span class="font-medium w-8 text-right">{{ count }}</span>
+                                    <div class="h-2 w-24 rounded-full bg-muted overflow-hidden">
+                                        <div
+                                            class="h-full bg-blue-600 rounded-full transition-all"
+                                            :style="{ width: `${(count / Math.max(...charts.check_ins_by_day.data)) * 100}%` }"
+                                        />
+                                    </div>
+                                    <span class="font-medium w-12 text-right">{{ count }}</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
 
                 <!-- Quick Actions -->
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
-                    <div class="border-b border-sidebar-border/50 px-6 py-4">
-                        <h2 class="text-lg font-semibold">Quick Actions</h2>
-                        <p class="text-sm text-muted-foreground">Common tasks</p>
-                    </div>
-                    <div class="p-6">
-                        <div class="grid gap-3">
-                            <Link
-                                href="/members/create"
-                                class="flex items-center gap-3 rounded-lg border border-sidebar-border/50 p-4 hover:bg-sidebar-accent transition-colors"
-                            >
-                                <Users class="h-5 w-5 text-muted-foreground" />
-                                <span class="font-medium">Add New Member</span>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Quick Actions</CardTitle>
+                        <CardDescription>Common tasks and shortcuts</CardDescription>
+                    </CardHeader>
+                    <CardContent class="grid gap-2">
+                        <Button as-child variant="outline" class="justify-start h-auto py-3">
+                            <Link href="/members/create" class="flex items-center gap-3">
+                                <div class="rounded-lg bg-primary/10 p-2">
+                                    <UserPlus class="h-4 w-4 text-primary" />
+                                </div>
+                                <div class="text-left">
+                                    <div class="font-medium">Add New Member</div>
+                                    <div class="text-xs text-muted-foreground">Register a new gym member</div>
+                                </div>
                             </Link>
-                            <Link
-                                href="/attendance/scan"
-                                class="flex items-center gap-3 rounded-lg border border-sidebar-border/50 p-4 hover:bg-sidebar-accent transition-colors"
-                            >
-                                <UserCheck class="h-5 w-5 text-muted-foreground" />
-                                <span class="font-medium">QR Code Check-in</span>
+                        </Button>
+                        <Button as-child variant="outline" class="justify-start h-auto py-3">
+                            <Link href="/attendance/scan" class="flex items-center gap-3">
+                                <div class="rounded-lg bg-green-500/10 p-2">
+                                    <QrCode class="h-4 w-4 text-green-600 dark:text-green-500" />
+                                </div>
+                                <div class="text-left">
+                                    <div class="font-medium">QR Code Check-in</div>
+                                    <div class="text-xs text-muted-foreground">Scan member QR codes</div>
+                                </div>
                             </Link>
-                            <Link
-                                href="/invoices"
-                                class="flex items-center gap-3 rounded-lg border border-sidebar-border/50 p-4 hover:bg-sidebar-accent transition-colors"
-                            >
-                                <DollarSign class="h-5 w-5 text-muted-foreground" />
-                                <span class="font-medium">View Invoices</span>
+                        </Button>
+                        <Button as-child variant="outline" class="justify-start h-auto py-3">
+                            <Link href="/invoices" class="flex items-center gap-3">
+                                <div class="rounded-lg bg-orange-500/10 p-2">
+                                    <FileText class="h-4 w-4 text-orange-600 dark:text-orange-500" />
+                                </div>
+                                <div class="text-left">
+                                    <div class="font-medium">View Invoices</div>
+                                    <div class="text-xs text-muted-foreground">Manage billing and invoices</div>
+                                </div>
                             </Link>
-                            <Link
-                                href="/attendance"
-                                class="flex items-center gap-3 rounded-lg border border-sidebar-border/50 p-4 hover:bg-sidebar-accent transition-colors"
-                            >
-                                <TrendingUp class="h-5 w-5 text-muted-foreground" />
-                                <span class="font-medium">View Attendance</span>
+                        </Button>
+                        <Button as-child variant="outline" class="justify-start h-auto py-3">
+                            <Link href="/attendance" class="flex items-center gap-3">
+                                <div class="rounded-lg bg-blue-500/10 p-2">
+                                    <Activity class="h-4 w-4 text-blue-600 dark:text-blue-500" />
+                                </div>
+                                <div class="text-left">
+                                    <div class="font-medium">View Attendance</div>
+                                    <div class="text-xs text-muted-foreground">Check attendance records</div>
+                                </div>
                             </Link>
-                        </div>
-                    </div>
-                </div>
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     </AppLayout>
