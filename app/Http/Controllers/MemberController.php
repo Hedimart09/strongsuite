@@ -83,11 +83,17 @@ class MemberController extends Controller
         // Generate PIN URL
         $pinUrl = route('member.pin.view', ['token' => $token]);
 
-        // Send email to member
-        Mail::to($member->email)->send(new MemberPinMail($member, $pinUrl));
+        // Send email to member (non-blocking)
+        try {
+            Mail::to($member->email)->send(new MemberPinMail($member, $pinUrl));
+            $message = 'Member registered successfully! A secure PIN link has been sent to '.$member->email;
+        } catch (\Exception $e) {
+            \Log::error('Failed to send member PIN email: '.$e->getMessage());
+            $message = 'Member registered successfully! Note: Email notification could not be sent. PIN: '.$pin;
+        }
 
         return redirect()->route('members.show', $member)
-            ->with('success', 'Member registered successfully! A secure PIN link has been sent to '.$member->email);
+            ->with('success', $message);
     }
 
     public function show(Member $member)
