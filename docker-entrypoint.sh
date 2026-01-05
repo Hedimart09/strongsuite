@@ -20,6 +20,10 @@ php artisan migrate --force
 echo "Seeding roles and permissions..."
 php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder --force || true
 
+# Seed admin users
+echo "Seeding admin users..."
+php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder --force || true
+
 # Cache configuration for production
 echo "Caching configuration..."
 php artisan config:cache
