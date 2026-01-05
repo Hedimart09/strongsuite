@@ -1,11 +1,14 @@
 #!/bin/bash
 set -e
 
+echo "Starting StrongSuite deployment..."
+
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
-sleep 5
+sleep 10
 
 # Clear any cached config that might have wrong values
+echo "Clearing cached configuration..."
 php artisan config:clear || true
 php artisan cache:clear || true
 
@@ -23,7 +26,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "Application ready!"
+echo "Application ready! Starting server on port ${PORT:-8080}..."
 
 # Execute the main container command
 exec "$@"
