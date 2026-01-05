@@ -44,12 +44,20 @@ class Member extends Model implements AuthenticatableContract
         ];
     }
 
-    protected function photo(): Attribute
+    protected $appends = ['photo_url'];
+
+    public function getPhotoUrlAttribute(): ?string
     {
-        return Attribute::make(
-            get: fn ($value) => $value ? Storage::disk('public')->url($value) : null,
-            set: fn ($value) => $value,
-        );
+        if (!$this->attributes['photo']) {
+            return null;
+        }
+
+        // If it already has http/https, return as is
+        if (str_starts_with($this->attributes['photo'], 'http')) {
+            return $this->attributes['photo'];
+        }
+
+        return Storage::disk('public')->url($this->attributes['photo']);
     }
 
     public function user(): BelongsTo

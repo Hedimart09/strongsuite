@@ -10,11 +10,16 @@ Route::get('storage/{path}', function ($path) {
     $filePath = storage_path('app/public/' . $path);
 
     if (!file_exists($filePath)) {
+        \Log::error('Storage file not found: ' . $filePath);
         abort(404);
     }
 
-    return response()->file($filePath);
-})->where('path', '.*');
+    $mimeType = mime_content_type($filePath);
+
+    return response()->file($filePath, [
+        'Content-Type' => $mimeType,
+    ]);
+})->where('path', '.*')->name('storage.file');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

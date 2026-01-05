@@ -45,8 +45,14 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Install Node dependencies and build assets
 RUN npm ci && npm run build
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Create storage directories
+RUN mkdir -p storage/app/public/members/photos \
+    && mkdir -p storage/framework/{cache,sessions,testing,views} \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache
+
+# Set permissions (run as root, so use 777 for storage)
+RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port (Railway will set PORT env var)
 EXPOSE 8080
