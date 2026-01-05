@@ -16,6 +16,10 @@ php artisan cache:clear || true
 echo "Running migrations..."
 php artisan migrate --force
 
+# Create storage link
+echo "Creating storage symlink..."
+php artisan storage:link --force || true
+
 # Seed roles and permissions
 echo "Seeding roles and permissions..."
 php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder --force || true
