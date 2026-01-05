@@ -1,6 +1,8 @@
 {
+  "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "nixpacks"
+    "builder": "railpack",
+    "phpExtensions": ["bcmath", "pdo_pgsql", "mbstring", "xml", "curl", "zip", "gd"]
   },
   "deploy": {
     "startCommand": "php artisan migrate --force && php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder --force && php artisan serve --host=0.0.0.0 --port=$PORT",
