@@ -5,6 +5,17 @@ Emails are not being sent in production because:
 1. Queue worker was not running to process queued emails
 2. Email driver needs to be configured with a real mail service
 
+## ⚠️ Important: Mailtrap Confusion
+
+**DON'T USE** regular Mailtrap (smtp.mailtrap.io) in production - it's a testing sandbox that catches emails and prevents them from reaching real users!
+
+**DO USE** one of these for production:
+- ✅ **Mailtrap Send** (live.smtp.mailtrap.io) - Production service from Mailtrap
+- ✅ **Mailgun** - Recommended
+- ✅ **SendGrid** - Popular alternative
+- ✅ **Resend** - Modern option
+- ✅ **Gmail SMTP** - Quick testing only
+
 ## Solution Implemented
 
 ### 1. Queue Worker Setup ✅
@@ -84,7 +95,32 @@ MAIL_FROM_NAME="StrongSuite"
 
 ---
 
-## Option 4: Resend (Modern Alternative)
+## Option 4: Mailtrap Send (For Production)
+
+⚠️ **Note**: This is "Mailtrap Send" (production), NOT regular "Mailtrap" (testing sandbox)
+
+**Environment Variables:**
+```bash
+MAIL_MAILER=smtp
+MAIL_HOST=live.smtp.mailtrap.io
+MAIL_PORT=587
+MAIL_USERNAME=your-mailtrap-username
+MAIL_PASSWORD=your-mailtrap-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@your-domain.com
+MAIL_FROM_NAME="StrongSuite"
+```
+
+**Setup Steps:**
+1. Sign up at https://mailtrap.io (Free: 1,000 emails/month)
+2. Go to **Sending Domains** (not Email Testing)
+3. Verify your domain or use their sandbox domain
+4. Get SMTP credentials from the **Sending** section
+5. Use the "live.smtp.mailtrap.io" host (NOT "smtp.mailtrap.io")
+
+---
+
+## Option 5: Resend (Modern Alternative)
 
 **Environment Variables:**
 ```bash
