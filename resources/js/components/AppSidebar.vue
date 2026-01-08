@@ -10,20 +10,29 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, reports } from '@/routes';
+import { index as attendanceIndex } from '@/routes/attendance';
+import { index as financeIndex } from '@/routes/finance';
+import { index as invoicesIndex } from '@/routes/invoices';
 import { index as membersIndex } from '@/routes/members';
 import { index as membershipPlansIndex } from '@/routes/membership-plans';
-import { index as attendanceIndex } from '@/routes/attendance';
-import { index as invoicesIndex } from '@/routes/invoices';
 import { index as paymentsIndex } from '@/routes/payments';
-import { index as financeIndex } from '@/routes/finance';
-import { index as staffIndex } from '@/routes/staff';
-import { reports } from '@/routes';
 import { index as settingsIndex } from '@/routes/settings';
+import { index as staffIndex } from '@/routes/staff';
 import { Link } from '@inertiajs/vue3';
-import { BarChart3, ClipboardList, CreditCard, DollarSign, FileText, LayoutGrid, Settings, UserCog, Users, Wallet } from 'lucide-vue-next';
-import AppLogo from './AppLogo.vue';
+import {
+    ClipboardList,
+    CreditCard,
+    DollarSign,
+    FileText,
+    LayoutGrid,
+    Settings,
+    UserCog,
+    Users,
+    Wallet,
+} from 'lucide-vue-next';
 import type { Component } from 'vue';
+import AppLogo from './AppLogo.vue';
 
 interface NavSubItem {
     title: string;

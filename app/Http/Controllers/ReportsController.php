@@ -59,19 +59,22 @@ class ReportsController extends Controller
             ->get();
 
         // Top members by check-ins
-        $topMembers = Attendance::whereBetween('check_in_time', [$startDate, $endDate.' 23:59:59'])
+        $topMembersData = Attendance::whereBetween('check_in_time', [$startDate, $endDate.' 23:59:59'])
             ->select('member_id', DB::raw('COUNT(*) as check_in_count'))
             ->groupBy('member_id')
             ->orderByDesc('check_in_count')
             ->limit(10)
-            ->with('member:id,name,member_id')
-            ->get()
-            ->map(function ($attendance) {
-                return [
-                    'member' => $attendance->member,
-                    'check_in_count' => $attendance->check_in_count,
-                ];
-            });
+            ->get();
+
+        $memberIds = $topMembersData->pluck('member_id');
+        $members = Member::whereIn('id', $memberIds)->get()->keyBy('id');
+
+        $topMembers = $topMembersData->map(function ($item) use ($members) {
+            return [
+                'member' => $members->get($item->member_id),
+                'check_in_count' => $item->check_in_count,
+            ];
+        });
 
         // Peak hours
         $driver = DB::getDriverName();
@@ -150,22 +153,25 @@ class ReportsController extends Controller
             ->get();
 
         // Top paying members
-        $topPayingMembers = Payment::where('status', 'completed')
+        $topPayingData = Payment::where('status', 'completed')
             ->whereDate('payment_date', '>=', $startDate)
             ->whereDate('payment_date', '<=', $endDate)
             ->select('member_id', DB::raw('SUM(amount) as total_paid'), DB::raw('COUNT(*) as payment_count'))
             ->groupBy('member_id')
             ->orderByDesc('total_paid')
             ->limit(10)
-            ->with('member:id,name,member_id')
-            ->get()
-            ->map(function ($payment) {
-                return [
-                    'member' => $payment->member,
-                    'total_paid' => $payment->total_paid,
-                    'payment_count' => $payment->payment_count,
-                ];
-            });
+            ->get();
+
+        $memberIds = $topPayingData->pluck('member_id');
+        $members = Member::whereIn('id', $memberIds)->get()->keyBy('id');
+
+        $topPayingMembers = $topPayingData->map(function ($item) use ($members) {
+            return [
+                'member' => $members->get($item->member_id),
+                'total_paid' => $item->total_paid,
+                'payment_count' => $item->payment_count,
+            ];
+        });
 
         return [
             'summary' => [
@@ -208,11 +214,17 @@ class ReportsController extends Controller
 
         // Recently registered members
         $recentMembers = Member::whereBetween('created_at', [$startDate, $endDate.' 23:59:59'])
-            ->with('activeSubscription.membershipPlan')
+            ->with(['subscriptions' => function ($query) {
+                $query->where('status', 'active')
+                    ->where('end_date', '>=', now())
+                    ->with('membershipPlan');
+            }])
             ->latest()
             ->limit(20)
             ->get()
             ->map(function ($member) {
+                $activeSubscription = $member->subscriptions->first();
+
                 return [
                     'id' => $member->id,
                     'name' => $member->name,
@@ -220,7 +232,7 @@ class ReportsController extends Controller
                     'email' => $member->email,
                     'status' => $member->status,
                     'created_at' => $member->created_at->toISOString(),
-                    'subscription' => $member->activeSubscription->first(),
+                    'subscription' => $activeSubscription,
                 ];
             });
 

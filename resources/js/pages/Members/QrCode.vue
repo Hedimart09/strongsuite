@@ -57,12 +57,16 @@ const downloadQrCode = () => {
     <Head :title="`QR Code - ${member.name}`" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <!-- Header -->
             <div class="flex items-center justify-between print:hidden">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">Member QR Code</h1>
-                    <p class="text-sm text-muted-foreground mt-1">
+                    <h1 class="text-2xl font-bold tracking-tight">
+                        Member QR Code
+                    </h1>
+                    <p class="mt-1 text-sm text-muted-foreground">
                         Scan this code for quick check-in
                     </p>
                 </div>
@@ -73,7 +77,7 @@ const downloadQrCode = () => {
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 mr-2"
+                            class="mr-2 h-4 w-4"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -93,7 +97,7 @@ const downloadQrCode = () => {
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 mr-2"
+                            class="mr-2 h-4 w-4"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -112,12 +116,14 @@ const downloadQrCode = () => {
 
             <!-- QR Code Card -->
             <div class="mx-auto max-w-2xl">
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-white dark:bg-sidebar p-8 text-center">
+                <div
+                    class="rounded-xl border border-sidebar-border/70 bg-white p-8 text-center dark:border-sidebar-border dark:bg-sidebar"
+                >
                     <!-- Member Info -->
                     <div class="mb-6">
                         <div
                             v-if="member.photo"
-                            class="mx-auto h-20 w-20 rounded-full overflow-hidden mb-4"
+                            class="mx-auto mb-4 h-20 w-20 overflow-hidden rounded-full"
                         >
                             <img
                                 :src="`/storage/${member.photo}`"
@@ -127,42 +133,55 @@ const downloadQrCode = () => {
                         </div>
                         <div
                             v-else
-                            class="mx-auto h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mb-4"
+                            class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10"
                         >
                             <span class="text-2xl font-medium text-primary">
                                 {{ member.name.charAt(0).toUpperCase() }}
                             </span>
                         </div>
                         <h2 class="text-xl font-bold">{{ member.name }}</h2>
-                        <p class="text-sm text-muted-foreground mt-1">{{ member.email }}</p>
-                        <p class="text-sm text-muted-foreground">{{ member.phone }}</p>
+                        <p class="mt-1 text-sm text-muted-foreground">
+                            {{ member.email }}
+                        </p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ member.phone }}
+                        </p>
                     </div>
 
                     <!-- QR Code -->
-                    <div class="bg-white p-8 rounded-lg inline-block">
+                    <div class="inline-block rounded-lg bg-white p-8">
                         <div v-html="qrCodeSvg" class="mx-auto"></div>
                     </div>
 
                     <!-- Member ID -->
                     <div class="mt-6">
-                        <p class="text-sm font-medium text-muted-foreground">Member ID</p>
-                        <code class="inline-block mt-2 bg-sidebar px-4 py-2 rounded text-lg font-mono">
+                        <p class="text-sm font-medium text-muted-foreground">
+                            Member ID
+                        </p>
+                        <code
+                            class="mt-2 inline-block rounded bg-sidebar px-4 py-2 font-mono text-lg"
+                        >
                             {{ member.member_id }}
                         </code>
                     </div>
 
                     <div class="mt-6">
-                        <p class="text-sm font-medium text-muted-foreground">QR Code</p>
-                        <code class="inline-block mt-2 bg-sidebar px-4 py-2 rounded text-sm font-mono">
+                        <p class="text-sm font-medium text-muted-foreground">
+                            QR Code
+                        </p>
+                        <code
+                            class="mt-2 inline-block rounded bg-sidebar px-4 py-2 font-mono text-sm"
+                        >
                             {{ member.qr_code }}
                         </code>
                     </div>
 
                     <!-- Instructions -->
-                    <div class="mt-8 p-4 bg-sidebar/50 rounded-lg print:hidden">
+                    <div class="mt-8 rounded-lg bg-sidebar/50 p-4 print:hidden">
                         <p class="text-xs text-muted-foreground">
-                            <strong>Instructions:</strong> Present this QR code at the gym entrance for quick check-in.
-                            You can print this card or save the QR code to your phone.
+                            <strong>Instructions:</strong> Present this QR code
+                            at the gym entrance for quick check-in. You can
+                            print this card or save the QR code to your phone.
                         </p>
                     </div>
                 </div>

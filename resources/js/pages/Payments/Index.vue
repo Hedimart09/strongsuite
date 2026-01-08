@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
 import RecordManualPaymentModal from '@/components/RecordManualPaymentModal.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { CreditCard, Search, Filter, Plus } from 'lucide-vue-next';
+import { CreditCard, Plus, Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 interface Payment {
@@ -70,19 +70,23 @@ const canRecordManualPayment = () => {
     return userPermissions.includes('payments.create');
 };
 
-watch([search, status, paymentMethod, startDate, endDate], () => {
-    const params: Record<string, string> = {};
-    if (search.value) params.search = search.value;
-    if (status.value) params.status = status.value;
-    if (paymentMethod.value) params.payment_method = paymentMethod.value;
-    if (startDate.value) params.start_date = startDate.value;
-    if (endDate.value) params.end_date = endDate.value;
+watch(
+    [search, status, paymentMethod, startDate, endDate],
+    () => {
+        const params: Record<string, string> = {};
+        if (search.value) params.search = search.value;
+        if (status.value) params.status = status.value;
+        if (paymentMethod.value) params.payment_method = paymentMethod.value;
+        if (startDate.value) params.start_date = startDate.value;
+        if (endDate.value) params.end_date = endDate.value;
 
-    router.get('/payments', params, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-}, { debounce: 300 });
+        router.get('/payments', params, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    },
+    { debounce: 300 },
+);
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-GH', {
@@ -103,24 +107,37 @@ const formatDateTime = (dateString: string) => {
 
 const getStatusClass = (paymentStatus: string) => {
     const classes: Record<string, string> = {
-        completed: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+        completed:
+            'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+        pending:
+            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
         failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-        refunded: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
+        refunded:
+            'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
     };
-    return classes[paymentStatus] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    return (
+        classes[paymentStatus] ||
+        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+    );
 };
 
 const getMethodBadgeClass = (method: string) => {
     const classes: Record<string, string> = {
-        paystack: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-        flutterwave: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
+        paystack:
+            'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+        flutterwave:
+            'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
         stripe: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
         cash: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-        mobile_money: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-        bank_transfer: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
+        mobile_money:
+            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+        bank_transfer:
+            'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
     };
-    return classes[method] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    return (
+        classes[method] ||
+        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+    );
 };
 </script>
 
@@ -128,12 +145,14 @@ const getMethodBadgeClass = (method: string) => {
     <Head title="Payments" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">Payments</h1>
-                    <p class="text-sm text-muted-foreground mt-1">
+                    <p class="mt-1 text-sm text-muted-foreground">
                         View and manage all payment transactions
                     </p>
                 </div>
@@ -156,11 +175,16 @@ const getMethodBadgeClass = (method: string) => {
             </div>
 
             <!-- Filters -->
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-4">
+            <div
+                class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
+            >
                 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <div class="lg:col-span-2">
-                        <label for="search" class="block text-sm font-medium mb-2">
-                            <Search class="inline h-4 w-4 mr-1" />
+                        <label
+                            for="search"
+                            class="mb-2 block text-sm font-medium"
+                        >
+                            <Search class="mr-1 inline h-4 w-4" />
                             Search
                         </label>
                         <input
@@ -168,16 +192,20 @@ const getMethodBadgeClass = (method: string) => {
                             v-model="search"
                             type="text"
                             placeholder="Search by transaction ID or member name..."
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
 
                     <div>
-                        <label for="status" class="block text-sm font-medium mb-2">Status</label>
+                        <label
+                            for="status"
+                            class="mb-2 block text-sm font-medium"
+                            >Status</label
+                        >
                         <select
                             id="status"
                             v-model="status"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         >
                             <option value="">All Status</option>
                             <option value="completed">Completed</option>
@@ -188,11 +216,15 @@ const getMethodBadgeClass = (method: string) => {
                     </div>
 
                     <div>
-                        <label for="payment_method" class="block text-sm font-medium mb-2">Payment Method</label>
+                        <label
+                            for="payment_method"
+                            class="mb-2 block text-sm font-medium"
+                            >Payment Method</label
+                        >
                         <select
                             id="payment_method"
                             v-model="paymentMethod"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         >
                             <option value="">All Methods</option>
                             <option value="paystack">Paystack</option>
@@ -205,23 +237,31 @@ const getMethodBadgeClass = (method: string) => {
                     </div>
                 </div>
 
-                <div class="grid gap-4 md:grid-cols-2 mt-4">
+                <div class="mt-4 grid gap-4 md:grid-cols-2">
                     <div>
-                        <label for="start_date" class="block text-sm font-medium mb-2">Start Date</label>
+                        <label
+                            for="start_date"
+                            class="mb-2 block text-sm font-medium"
+                            >Start Date</label
+                        >
                         <input
                             id="start_date"
                             v-model="startDate"
                             type="date"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
                     <div>
-                        <label for="end_date" class="block text-sm font-medium mb-2">End Date</label>
+                        <label
+                            for="end_date"
+                            class="mb-2 block text-sm font-medium"
+                            >End Date</label
+                        >
                         <input
                             id="end_date"
                             v-model="endDate"
                             type="date"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
                 </div>
@@ -231,75 +271,139 @@ const getMethodBadgeClass = (method: string) => {
             <div class="grid gap-4 md:grid-cols-4">
                 <div class="rounded-lg border border-sidebar-border/70 p-4">
                     <p class="text-sm text-muted-foreground">Total Payments</p>
-                    <p class="text-2xl font-bold mt-1">{{ payments.total }}</p>
+                    <p class="mt-1 text-2xl font-bold">{{ payments.total }}</p>
                 </div>
                 <div class="rounded-lg border border-sidebar-border/70 p-4">
                     <p class="text-sm text-muted-foreground">Completed</p>
-                    <p class="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">
-                        {{ payments.data.filter(p => p.status === 'completed').length }}
+                    <p
+                        class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400"
+                    >
+                        {{
+                            payments.data.filter(
+                                (p) => p.status === 'completed',
+                            ).length
+                        }}
                     </p>
                 </div>
                 <div class="rounded-lg border border-sidebar-border/70 p-4">
                     <p class="text-sm text-muted-foreground">Pending</p>
-                    <p class="text-2xl font-bold mt-1 text-yellow-600 dark:text-yellow-400">
-                        {{ payments.data.filter(p => p.status === 'pending').length }}
+                    <p
+                        class="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400"
+                    >
+                        {{
+                            payments.data.filter((p) => p.status === 'pending')
+                                .length
+                        }}
                     </p>
                 </div>
                 <div class="rounded-lg border border-sidebar-border/70 p-4">
                     <p class="text-sm text-muted-foreground">Failed</p>
-                    <p class="text-2xl font-bold mt-1 text-red-600 dark:text-red-400">
-                        {{ payments.data.filter(p => p.status === 'failed').length }}
+                    <p
+                        class="mt-1 text-2xl font-bold text-red-600 dark:text-red-400"
+                    >
+                        {{
+                            payments.data.filter((p) => p.status === 'failed')
+                                .length
+                        }}
                     </p>
                 </div>
             </div>
 
             <!-- Payments List -->
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+            <div
+                class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
+            >
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-sidebar-border bg-sidebar">
+                        <thead
+                            class="border-b border-sidebar-border bg-sidebar"
+                        >
                             <tr>
-                                <th class="px-4 py-3 text-left font-medium">Transaction</th>
-                                <th class="px-4 py-3 text-left font-medium">Member</th>
-                                <th class="px-4 py-3 text-left font-medium">Amount</th>
-                                <th class="px-4 py-3 text-left font-medium">Method</th>
-                                <th class="px-4 py-3 text-left font-medium">Status</th>
-                                <th class="px-4 py-3 text-left font-medium">Date</th>
-                                <th class="px-4 py-3 text-left font-medium">Actions</th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Transaction
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Member
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Amount
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Method
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Status
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Date
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-sidebar-border/50">
                             <tr
                                 v-for="payment in payments.data"
                                 :key="payment.id"
-                                class="hover:bg-sidebar/50 transition-colors"
+                                class="transition-colors hover:bg-sidebar/50"
                             >
                                 <td class="px-4 py-3">
                                     <div>
-                                        <p class="font-medium">{{ payment.transaction_id || 'N/A' }}</p>
-                                        <p class="text-xs text-muted-foreground" v-if="payment.subscription">
-                                            {{ payment.subscription.membership_plan.name }}
+                                        <p class="font-medium">
+                                            {{
+                                                payment.transaction_id || 'N/A'
+                                            }}
                                         </p>
-                                        <p class="text-xs text-muted-foreground" v-if="payment.invoice">
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                            v-if="payment.subscription"
+                                        >
+                                            {{
+                                                payment.subscription
+                                                    .membership_plan.name
+                                            }}
+                                        </p>
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                            v-if="payment.invoice"
+                                        >
                                             {{ payment.invoice.invoice_number }}
                                         </p>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div>
-                                        <p class="font-medium">{{ payment.member.name }}</p>
-                                        <p class="text-xs text-muted-foreground">{{ payment.member.member_id }}</p>
+                                        <p class="font-medium">
+                                            {{ payment.member.name }}
+                                        </p>
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
+                                            {{ payment.member.member_id }}
+                                        </p>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <p class="font-semibold">{{ formatCurrency(payment.amount) }}</p>
+                                    <p class="font-semibold">
+                                        {{ formatCurrency(payment.amount) }}
+                                    </p>
                                 </td>
                                 <td class="px-4 py-3">
                                     <span
                                         class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize"
-                                        :class="getMethodBadgeClass(payment.payment_method)"
+                                        :class="
+                                            getMethodBadgeClass(
+                                                payment.payment_method,
+                                            )
+                                        "
                                     >
-                                        {{ payment.payment_method.replace('_', ' ') }}
+                                        {{
+                                            payment.payment_method.replace(
+                                                '_',
+                                                ' ',
+                                            )
+                                        }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
@@ -311,7 +415,11 @@ const getMethodBadgeClass = (method: string) => {
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <p class="text-sm">{{ formatDateTime(payment.payment_date) }}</p>
+                                    <p class="text-sm">
+                                        {{
+                                            formatDateTime(payment.payment_date)
+                                        }}
+                                    </p>
                                 </td>
                                 <td class="px-4 py-3">
                                     <Link
@@ -327,18 +435,32 @@ const getMethodBadgeClass = (method: string) => {
                 </div>
 
                 <!-- No Results -->
-                <div v-if="payments.data.length === 0" class="text-center py-12">
-                    <CreditCard class="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <div
+                    v-if="payments.data.length === 0"
+                    class="py-12 text-center"
+                >
+                    <CreditCard
+                        class="mx-auto mb-4 h-12 w-12 text-muted-foreground"
+                    />
                     <p class="text-muted-foreground">No payments found</p>
                 </div>
             </div>
 
             <!-- Pagination -->
-            <div v-if="payments.last_page > 1" class="flex items-center justify-between">
+            <div
+                v-if="payments.last_page > 1"
+                class="flex items-center justify-between"
+            >
                 <p class="text-sm text-muted-foreground">
-                    Showing {{ (payments.current_page - 1) * payments.per_page + 1 }} to
-                    {{ Math.min(payments.current_page * payments.per_page, payments.total) }} of
-                    {{ payments.total }} results
+                    Showing
+                    {{ (payments.current_page - 1) * payments.per_page + 1 }} to
+                    {{
+                        Math.min(
+                            payments.current_page * payments.per_page,
+                            payments.total,
+                        )
+                    }}
+                    of {{ payments.total }} results
                 </p>
                 <div class="flex gap-2">
                     <Link
@@ -346,11 +468,11 @@ const getMethodBadgeClass = (method: string) => {
                         :key="index"
                         :href="link.url || '#'"
                         :class="[
-                            'px-3 py-2 text-sm rounded-lg border',
+                            'rounded-lg border px-3 py-2 text-sm',
                             link.active
-                                ? 'bg-primary text-primary-foreground border-primary'
+                                ? 'border-primary bg-primary text-primary-foreground'
                                 : 'border-sidebar-border/70 hover:bg-accent',
-                            !link.url && 'opacity-50 cursor-not-allowed',
+                            !link.url && 'cursor-not-allowed opacity-50',
                         ]"
                         v-html="link.label"
                     />

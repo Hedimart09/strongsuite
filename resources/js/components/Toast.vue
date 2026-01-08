@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CheckCircle2, XCircle, AlertCircle, X } from 'lucide-vue-next';
 import { usePage } from '@inertiajs/vue3';
+import { AlertCircle, CheckCircle2, X, XCircle } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 interface FlashMessage {
@@ -16,7 +16,8 @@ const message = ref('');
 const type = ref<'success' | 'error' | 'warning' | 'info'>('success');
 
 const toastClasses = computed(() => {
-    const baseClasses = 'fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border transition-all duration-300 max-w-md';
+    const baseClasses =
+        'fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border transition-all duration-300 max-w-md';
 
     switch (type.value) {
         case 'success':
@@ -96,7 +97,7 @@ watch(
             autoHide();
         }
     },
-    { deep: true, immediate: true }
+    { deep: true, immediate: true },
 );
 </script>
 
@@ -110,11 +111,15 @@ watch(
         leave-to-class="opacity-0 translate-x-full"
     >
         <div v-if="showToast" :class="toastClasses" role="alert">
-            <component :is="iconComponent" :class="iconClasses" class="size-5 flex-shrink-0" />
+            <component
+                :is="iconComponent"
+                :class="iconClasses"
+                class="size-5 flex-shrink-0"
+            />
             <p class="flex-1 text-sm font-medium">{{ message }}</p>
             <button
                 @click="closeToast"
-                class="flex-shrink-0 rounded-md p-1 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                class="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
                 aria-label="Close"
             >
                 <X class="size-4" />

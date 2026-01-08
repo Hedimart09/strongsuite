@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
 import InputError from '@/components/InputError.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 interface Staff {
@@ -41,11 +41,15 @@ const submit = () => {
                 <h1 class="text-2xl font-bold">Edit Staff Member</h1>
             </div>
 
-            <div class="max-w-2xl rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <div
+                class="max-w-2xl rounded-lg bg-white p-6 shadow dark:bg-gray-800"
+            >
                 <form @submit.prevent="submit" class="space-y-6">
                     <!-- Name -->
                     <div>
-                        <label class="mb-2 block text-sm font-medium">Name</label>
+                        <label class="mb-2 block text-sm font-medium"
+                            >Name</label
+                        >
                         <input
                             v-model="form.name"
                             type="text"
@@ -57,7 +61,9 @@ const submit = () => {
 
                     <!-- Email -->
                     <div>
-                        <label class="mb-2 block text-sm font-medium">Email</label>
+                        <label class="mb-2 block text-sm font-medium"
+                            >Email</label
+                        >
                         <input
                             v-model="form.email"
                             type="email"
@@ -94,14 +100,20 @@ const submit = () => {
 
                     <!-- Role -->
                     <div>
-                        <label class="mb-2 block text-sm font-medium">Role</label>
+                        <label class="mb-2 block text-sm font-medium"
+                            >Role</label
+                        >
                         <select
                             v-model="form.role"
                             class="w-full rounded-lg border px-4 py-2 dark:bg-gray-700"
                             required
                         >
                             <option value="">Select a role</option>
-                            <option v-for="role in roles" :key="role.name" :value="role.name">
+                            <option
+                                v-for="role in roles"
+                                :key="role.name"
+                                :value="role.name"
+                            >
                                 {{ role.name }}
                             </option>
                         </select>

@@ -44,16 +44,20 @@ const breadcrumbs: BreadcrumbItem[] = [
 const date = ref(props.filters.date || new Date().toISOString().split('T')[0]);
 const search = ref(props.filters.search || '');
 
-watch([date, search], () => {
-    const params: Record<string, string> = {};
-    if (date.value) params.date = date.value;
-    if (search.value) params.search = search.value;
+watch(
+    [date, search],
+    () => {
+        const params: Record<string, string> = {};
+        if (date.value) params.date = date.value;
+        if (search.value) params.search = search.value;
 
-    router.get('/attendance', params, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-}, { debounce: 300 });
+        router.get('/attendance', params, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    },
+    { debounce: 300 },
+);
 
 const formatTime = (datetime: string) => {
     return new Date(datetime).toLocaleTimeString('en-US', {
@@ -83,11 +87,15 @@ const getMethodBadge = (method: string) => {
     <Head title="Attendance" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">Attendance Log</h1>
-                    <p class="text-sm text-muted-foreground mt-1">
+                    <h1 class="text-2xl font-bold tracking-tight">
+                        Attendance Log
+                    </h1>
+                    <p class="mt-1 text-sm text-muted-foreground">
                         Track member check-ins and check-outs
                     </p>
                 </div>
@@ -104,7 +112,7 @@ const getMethodBadge = (method: string) => {
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 mr-2"
+                            class="mr-2 h-4 w-4"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -121,55 +129,79 @@ const getMethodBadge = (method: string) => {
                 </div>
             </div>
 
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-4">
+            <div
+                class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
+            >
                 <div class="grid gap-4 md:grid-cols-3">
                     <div>
-                        <label for="date" class="block text-sm font-medium mb-2">Date</label>
+                        <label for="date" class="mb-2 block text-sm font-medium"
+                            >Date</label
+                        >
                         <input
                             id="date"
                             v-model="date"
                             type="date"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
 
                     <div class="md:col-span-2">
-                        <label for="search" class="block text-sm font-medium mb-2">Search</label>
+                        <label
+                            for="search"
+                            class="mb-2 block text-sm font-medium"
+                            >Search</label
+                        >
                         <input
                             id="search"
                             v-model="search"
                             type="text"
                             placeholder="Search by name or member ID..."
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
                 </div>
             </div>
 
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+            <div
+                class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
+            >
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-sidebar-border bg-sidebar">
+                        <thead
+                            class="border-b border-sidebar-border bg-sidebar"
+                        >
                             <tr>
-                                <th class="px-4 py-3 text-left font-medium">Member</th>
-                                <th class="px-4 py-3 text-left font-medium">Check In</th>
-                                <th class="px-4 py-3 text-left font-medium">Check Out</th>
-                                <th class="px-4 py-3 text-left font-medium">Duration</th>
-                                <th class="px-4 py-3 text-left font-medium">Method</th>
-                                <th class="px-4 py-3 text-left font-medium">Actions</th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Member
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Check In
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Check Out
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Duration
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Method
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-sidebar-border/50">
                             <tr
                                 v-for="attendance in attendances.data"
                                 :key="attendance.id"
-                                class="hover:bg-sidebar/50 transition-colors"
+                                class="transition-colors hover:bg-sidebar/50"
                             >
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
                                         <div
                                             v-if="attendance.member.photo"
-                                            class="h-8 w-8 rounded-full overflow-hidden"
+                                            class="h-8 w-8 overflow-hidden rounded-full"
                                         >
                                             <img
                                                 :src="`/storage/${attendance.member.photo}`"
@@ -179,29 +211,62 @@ const getMethodBadge = (method: string) => {
                                         </div>
                                         <div
                                             v-else
-                                            class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center"
+                                            class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10"
                                         >
-                                            <span class="text-xs font-medium text-primary">
-                                                {{ attendance.member.name.charAt(0).toUpperCase() }}
+                                            <span
+                                                class="text-xs font-medium text-primary"
+                                            >
+                                                {{
+                                                    attendance.member.name
+                                                        .charAt(0)
+                                                        .toUpperCase()
+                                                }}
                                             </span>
                                         </div>
                                         <div>
-                                            <div class="font-medium">{{ attendance.member.name }}</div>
-                                            <div class="text-xs text-muted-foreground">{{ attendance.member.member_id }}</div>
+                                            <div class="font-medium">
+                                                {{ attendance.member.name }}
+                                            </div>
+                                            <div
+                                                class="text-xs text-muted-foreground"
+                                            >
+                                                {{
+                                                    attendance.member.member_id
+                                                }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3">{{ formatTime(attendance.check_in_time) }}</td>
                                 <td class="px-4 py-3">
-                                    {{ attendance.check_out_time ? formatTime(attendance.check_out_time) : '-' }}
+                                    {{ formatTime(attendance.check_in_time) }}
                                 </td>
-                                <td class="px-4 py-3">{{ formatDuration(attendance.duration) }}</td>
+                                <td class="px-4 py-3">
+                                    {{
+                                        attendance.check_out_time
+                                            ? formatTime(
+                                                  attendance.check_out_time,
+                                              )
+                                            : '-'
+                                    }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{ formatDuration(attendance.duration) }}
+                                </td>
                                 <td class="px-4 py-3">
                                     <span
-                                        :class="getMethodBadge(attendance.check_in_method)"
+                                        :class="
+                                            getMethodBadge(
+                                                attendance.check_in_method,
+                                            )
+                                        "
                                         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                                     >
-                                        {{ attendance.check_in_method === 'qr_code' ? 'QR Code' : 'Manual' }}
+                                        {{
+                                            attendance.check_in_method ===
+                                            'qr_code'
+                                                ? 'QR Code'
+                                                : 'Manual'
+                                        }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
@@ -218,11 +283,18 @@ const getMethodBadge = (method: string) => {
                                             Check Out
                                         </button>
                                     </form>
-                                    <span v-else class="text-xs text-muted-foreground">-</span>
+                                    <span
+                                        v-else
+                                        class="text-xs text-muted-foreground"
+                                        >-</span
+                                    >
                                 </td>
                             </tr>
                             <tr v-if="attendances.data.length === 0">
-                                <td colspan="6" class="px-4 py-8 text-center text-muted-foreground">
+                                <td
+                                    colspan="6"
+                                    class="px-4 py-8 text-center text-muted-foreground"
+                                >
                                     No attendance records found
                                 </td>
                             </tr>
@@ -232,11 +304,22 @@ const getMethodBadge = (method: string) => {
 
                 <div
                     v-if="attendances.last_page > 1"
-                    class="border-t border-sidebar-border px-4 py-3 flex items-center justify-between"
+                    class="flex items-center justify-between border-t border-sidebar-border px-4 py-3"
                 >
                     <div class="text-sm text-muted-foreground">
-                        Showing {{ ((attendances.current_page - 1) * attendances.per_page) + 1 }}
-                        to {{ Math.min(attendances.current_page * attendances.per_page, attendances.total) }}
+                        Showing
+                        {{
+                            (attendances.current_page - 1) *
+                                attendances.per_page +
+                            1
+                        }}
+                        to
+                        {{
+                            Math.min(
+                                attendances.current_page * attendances.per_page,
+                                attendances.total,
+                            )
+                        }}
                         of {{ attendances.total }} records
                     </div>
                     <div class="flex gap-2">
@@ -248,9 +331,9 @@ const getMethodBadge = (method: string) => {
                                 link.active
                                     ? 'bg-primary text-primary-foreground'
                                     : 'bg-sidebar hover:bg-sidebar-accent',
-                                !link.url && 'opacity-50 cursor-not-allowed',
+                                !link.url && 'cursor-not-allowed opacity-50',
                             ]"
-                            class="px-3 py-1 rounded text-sm"
+                            class="rounded px-3 py-1 text-sm"
                             v-html="link.label"
                         />
                     </div>

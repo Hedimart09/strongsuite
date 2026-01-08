@@ -43,7 +43,10 @@ const primaryRole = computed(() => {
         <span v-if="showEmail" class="truncate text-xs text-muted-foreground">{{
             user.email
         }}</span>
-        <span v-if="showRole && primaryRole" class="truncate text-xs text-muted-foreground">
+        <span
+            v-if="showRole && primaryRole"
+            class="truncate text-xs text-muted-foreground"
+        >
             {{ primaryRole }}
         </span>
     </div>

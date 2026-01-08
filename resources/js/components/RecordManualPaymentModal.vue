@@ -42,7 +42,9 @@ watch(
         if (!newValue) {
             // Reset form when modal closes
             form.value = {
-                amount: props.defaultAmount ? (props.defaultAmount / 100).toFixed(2) : '',
+                amount: props.defaultAmount
+                    ? (props.defaultAmount / 100).toFixed(2)
+                    : '',
                 currency: 'GHS',
                 payment_method: '',
                 transaction_id: '',
@@ -50,7 +52,7 @@ watch(
             };
             errors.value = {};
         }
-    }
+    },
 );
 
 const paymentMethods = [
@@ -147,14 +149,17 @@ const submitPayment = () => {
                                 placeholder="0.00"
                                 :class="{ 'border-red-500': errors.amount }"
                             />
-                            <p v-if="errors.amount" class="mt-1 text-sm text-red-500">
+                            <p
+                                v-if="errors.amount"
+                                class="mt-1 text-sm text-red-500"
+                            >
                                 {{ errors.amount }}
                             </p>
                         </div>
                         <select
                             v-model="form.currency"
                             disabled
-                            class="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         >
                             <option value="GHS">GHS</option>
                         </select>
@@ -169,7 +174,7 @@ const submitPayment = () => {
                     <select
                         id="payment_method"
                         v-model="form.payment_method"
-                        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         :class="{ 'border-red-500': errors.payment_method }"
                     >
                         <option value="" disabled>Select payment method</option>
@@ -181,7 +186,10 @@ const submitPayment = () => {
                             {{ method.label }}
                         </option>
                     </select>
-                    <p v-if="errors.payment_method" class="text-sm text-red-500">
+                    <p
+                        v-if="errors.payment_method"
+                        class="text-sm text-red-500"
+                    >
                         {{ errors.payment_method }}
                     </p>
                 </div>
@@ -190,7 +198,9 @@ const submitPayment = () => {
                 <div class="space-y-2">
                     <Label for="transaction_id">
                         Transaction ID / Reference
-                        <span class="text-xs text-muted-foreground">(Optional)</span>
+                        <span class="text-xs text-muted-foreground"
+                            >(Optional)</span
+                        >
                     </Label>
                     <Input
                         id="transaction_id"
@@ -202,13 +212,16 @@ const submitPayment = () => {
                 <!-- Notes -->
                 <div class="space-y-2">
                     <Label for="notes">
-                        Notes <span class="text-xs text-muted-foreground">(Optional)</span>
+                        Notes
+                        <span class="text-xs text-muted-foreground"
+                            >(Optional)</span
+                        >
                     </Label>
                     <textarea
                         id="notes"
                         v-model="form.notes"
                         rows="3"
-                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="Any additional notes about this payment..."
                     ></textarea>
                 </div>
@@ -223,7 +236,11 @@ const submitPayment = () => {
                 >
                     Cancel
                 </Button>
-                <Button type="button" @click="submitPayment" :disabled="processing">
+                <Button
+                    type="button"
+                    @click="submitPayment"
+                    :disabled="processing"
+                >
                     {{ processing ? 'Recording...' : 'Record Payment' }}
                 </Button>
             </DialogFooter>

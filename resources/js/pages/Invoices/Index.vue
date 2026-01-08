@@ -45,16 +45,20 @@ const breadcrumbs: BreadcrumbItem[] = [
 const status = ref(props.filters.status || '');
 const search = ref(props.filters.search || '');
 
-watch([status, search], () => {
-    const params: Record<string, string> = {};
-    if (status.value) params.status = status.value;
-    if (search.value) params.search = search.value;
+watch(
+    [status, search],
+    () => {
+        const params: Record<string, string> = {};
+        if (status.value) params.status = status.value;
+        if (search.value) params.search = search.value;
 
-    router.get('/invoices', params, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-}, { debounce: 300 });
+        router.get('/invoices', params, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    },
+    { debounce: 300 },
+);
 
 const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -79,22 +83,30 @@ const getStatusClass = (status: string) => {
     <Head title="Invoices" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Invoices</h1>
-                <p class="text-sm text-muted-foreground mt-1">
+                <p class="mt-1 text-sm text-muted-foreground">
                     Manage and track all invoices
                 </p>
             </div>
 
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-4">
+            <div
+                class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
+            >
                 <div class="grid gap-4 md:grid-cols-3">
                     <div>
-                        <label for="status" class="block text-sm font-medium mb-2">Status</label>
+                        <label
+                            for="status"
+                            class="mb-2 block text-sm font-medium"
+                            >Status</label
+                        >
                         <select
                             id="status"
                             v-model="status"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         >
                             <option value="">All Statuses</option>
                             <option value="draft">Draft</option>
@@ -106,46 +118,93 @@ const getStatusClass = (status: string) => {
                     </div>
 
                     <div class="md:col-span-2">
-                        <label for="search" class="block text-sm font-medium mb-2">Search</label>
+                        <label
+                            for="search"
+                            class="mb-2 block text-sm font-medium"
+                            >Search</label
+                        >
                         <input
                             id="search"
                             v-model="search"
                             type="text"
                             placeholder="Search by invoice number or member..."
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
                 </div>
             </div>
 
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+            <div
+                class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
+            >
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-sidebar-border bg-sidebar">
+                        <thead
+                            class="border-b border-sidebar-border bg-sidebar"
+                        >
                             <tr>
-                                <th class="px-4 py-3 text-left font-medium">Invoice #</th>
-                                <th class="px-4 py-3 text-left font-medium">Member</th>
-                                <th class="px-4 py-3 text-left font-medium">Issue Date</th>
-                                <th class="px-4 py-3 text-left font-medium">Due Date</th>
-                                <th class="px-4 py-3 text-left font-medium">Amount</th>
-                                <th class="px-4 py-3 text-left font-medium">Status</th>
-                                <th class="px-4 py-3 text-left font-medium">Actions</th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Invoice #
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Member
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Issue Date
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Due Date
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Amount
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Status
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-sidebar-border/50">
                             <tr
                                 v-for="invoice in invoices.data"
                                 :key="invoice.id"
-                                class="hover:bg-sidebar/50 transition-colors"
+                                class="transition-colors hover:bg-sidebar/50"
                             >
-                                <td class="px-4 py-3 font-mono text-xs">{{ invoice.invoice_number }}</td>
-                                <td class="px-4 py-3">
-                                    <div class="font-medium">{{ invoice.member.name }}</div>
-                                    <div class="text-xs text-muted-foreground">{{ invoice.member.member_id }}</div>
+                                <td class="px-4 py-3 font-mono text-xs">
+                                    {{ invoice.invoice_number }}
                                 </td>
-                                <td class="px-4 py-3">{{ new Date(invoice.issue_date).toLocaleDateString() }}</td>
-                                <td class="px-4 py-3">{{ new Date(invoice.due_date).toLocaleDateString() }}</td>
-                                <td class="px-4 py-3 font-medium">{{ formatCurrency(invoice.total_amount, invoice.currency) }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium">
+                                        {{ invoice.member.name }}
+                                    </div>
+                                    <div class="text-xs text-muted-foreground">
+                                        {{ invoice.member.member_id }}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{
+                                        new Date(
+                                            invoice.issue_date,
+                                        ).toLocaleDateString()
+                                    }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{
+                                        new Date(
+                                            invoice.due_date,
+                                        ).toLocaleDateString()
+                                    }}
+                                </td>
+                                <td class="px-4 py-3 font-medium">
+                                    {{
+                                        formatCurrency(
+                                            invoice.total_amount,
+                                            invoice.currency,
+                                        )
+                                    }}
+                                </td>
                                 <td class="px-4 py-3">
                                     <span
                                         :class="getStatusClass(invoice.status)"
@@ -173,7 +232,10 @@ const getStatusClass = (status: string) => {
                                 </td>
                             </tr>
                             <tr v-if="invoices.data.length === 0">
-                                <td colspan="7" class="px-4 py-8 text-center text-muted-foreground">
+                                <td
+                                    colspan="7"
+                                    class="px-4 py-8 text-center text-muted-foreground"
+                                >
                                     No invoices found
                                 </td>
                             </tr>
@@ -183,11 +245,20 @@ const getStatusClass = (status: string) => {
 
                 <div
                     v-if="invoices.last_page > 1"
-                    class="border-t border-sidebar-border px-4 py-3 flex items-center justify-between"
+                    class="flex items-center justify-between border-t border-sidebar-border px-4 py-3"
                 >
                     <div class="text-sm text-muted-foreground">
-                        Showing {{ ((invoices.current_page - 1) * invoices.per_page) + 1 }}
-                        to {{ Math.min(invoices.current_page * invoices.per_page, invoices.total) }}
+                        Showing
+                        {{
+                            (invoices.current_page - 1) * invoices.per_page + 1
+                        }}
+                        to
+                        {{
+                            Math.min(
+                                invoices.current_page * invoices.per_page,
+                                invoices.total,
+                            )
+                        }}
                         of {{ invoices.total }} records
                     </div>
                     <div class="flex gap-2">
@@ -199,9 +270,9 @@ const getStatusClass = (status: string) => {
                                 link.active
                                     ? 'bg-primary text-primary-foreground'
                                     : 'bg-sidebar hover:bg-sidebar-accent',
-                                !link.url && 'opacity-50 cursor-not-allowed',
+                                !link.url && 'cursor-not-allowed opacity-50',
                             ]"
-                            class="px-3 py-1 rounded text-sm"
+                            class="rounded px-3 py-1 text-sm"
                             v-html="link.label"
                         />
                     </div>

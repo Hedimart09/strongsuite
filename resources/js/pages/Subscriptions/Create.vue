@@ -29,7 +29,10 @@ const props = defineProps<Props>();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Members', href: '/members' },
     { title: props.member.name, href: `/members/${props.member.id}` },
-    { title: 'New Subscription', href: `/members/${props.member.id}/subscriptions/create` },
+    {
+        title: 'New Subscription',
+        href: `/members/${props.member.id}/subscriptions/create`,
+    },
 ];
 
 const form = useForm({
@@ -40,7 +43,7 @@ const form = useForm({
 });
 
 const selectedPlan = () => {
-    return props.plans.find(p => p.id === form.membership_plan_id);
+    return props.plans.find((p) => p.id === form.membership_plan_id);
 };
 
 const formatCurrency = (amount: number, currency: string) => {
@@ -67,84 +70,170 @@ const submit = () => {
     <Head title="Create Subscription" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Create Subscription</h1>
-                <p class="text-sm text-muted-foreground mt-1">Assign a membership plan to {{ member.name }}</p>
+                <h1 class="text-2xl font-bold tracking-tight">
+                    Create Subscription
+                </h1>
+                <p class="mt-1 text-sm text-muted-foreground">
+                    Assign a membership plan to {{ member.name }}
+                </p>
             </div>
 
             <form @submit.prevent="submit" class="space-y-8">
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                    <h2 class="text-lg font-semibold mb-4">Member Information</h2>
+                <div
+                    class="rounded-xl border border-sidebar-border/70 p-6 dark:border-sidebar-border"
+                >
+                    <h2 class="mb-4 text-lg font-semibold">
+                        Member Information
+                    </h2>
                     <dl class="space-y-2">
                         <div>
-                            <dt class="text-sm font-medium text-muted-foreground">Name</dt>
+                            <dt
+                                class="text-sm font-medium text-muted-foreground"
+                            >
+                                Name
+                            </dt>
                             <dd class="mt-1 text-sm">{{ member.name }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-muted-foreground">Member ID</dt>
+                            <dt
+                                class="text-sm font-medium text-muted-foreground"
+                            >
+                                Member ID
+                            </dt>
                             <dd class="mt-1 text-sm">{{ member.member_id }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-muted-foreground">Email</dt>
+                            <dt
+                                class="text-sm font-medium text-muted-foreground"
+                            >
+                                Email
+                            </dt>
                             <dd class="mt-1 text-sm">{{ member.email }}</dd>
                         </div>
                     </dl>
                 </div>
 
-                <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6">
-                    <h2 class="text-lg font-semibold mb-4">Subscription Details</h2>
+                <div
+                    class="rounded-xl border border-sidebar-border/70 p-6 dark:border-sidebar-border"
+                >
+                    <h2 class="mb-4 text-lg font-semibold">
+                        Subscription Details
+                    </h2>
 
                     <div class="grid gap-6 md:grid-cols-2">
                         <div class="md:col-span-2">
-                            <label for="membership_plan_id" class="block text-sm font-medium mb-2">Membership Plan *</label>
+                            <label
+                                for="membership_plan_id"
+                                class="mb-2 block text-sm font-medium"
+                                >Membership Plan *</label
+                            >
                             <select
                                 id="membership_plan_id"
                                 v-model="form.membership_plan_id"
                                 required
-                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                                :class="{ 'border-red-500': form.errors.membership_plan_id }"
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                :class="{
+                                    'border-red-500':
+                                        form.errors.membership_plan_id,
+                                }"
                             >
-                                <option v-for="plan in plans" :key="plan.id" :value="plan.id">
-                                    {{ plan.name }} - {{ formatCurrency(plan.price, plan.currency) }} / {{ formatDuration(plan.duration_in_days) }}
+                                <option
+                                    v-for="plan in plans"
+                                    :key="plan.id"
+                                    :value="plan.id"
+                                >
+                                    {{ plan.name }} -
+                                    {{
+                                        formatCurrency(
+                                            plan.price,
+                                            plan.currency,
+                                        )
+                                    }}
+                                    /
+                                    {{ formatDuration(plan.duration_in_days) }}
                                 </option>
                             </select>
-                            <p v-if="form.errors.membership_plan_id" class="mt-1 text-sm text-red-600">{{ form.errors.membership_plan_id }}</p>
+                            <p
+                                v-if="form.errors.membership_plan_id"
+                                class="mt-1 text-sm text-red-600"
+                            >
+                                {{ form.errors.membership_plan_id }}
+                            </p>
                         </div>
 
-                        <div v-if="selectedPlan()" class="md:col-span-2 p-4 bg-sidebar rounded-lg">
-                            <h3 class="font-medium text-sm mb-2">Plan Details</h3>
+                        <div
+                            v-if="selectedPlan()"
+                            class="rounded-lg bg-sidebar p-4 md:col-span-2"
+                        >
+                            <h3 class="mb-2 text-sm font-medium">
+                                Plan Details
+                            </h3>
                             <dl class="space-y-2 text-sm">
                                 <div>
                                     <dt class="text-muted-foreground">Price</dt>
-                                    <dd class="font-medium">{{ formatCurrency(selectedPlan()!.price, selectedPlan()!.currency) }}</dd>
+                                    <dd class="font-medium">
+                                        {{
+                                            formatCurrency(
+                                                selectedPlan()!.price,
+                                                selectedPlan()!.currency,
+                                            )
+                                        }}
+                                    </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-muted-foreground">Duration</dt>
-                                    <dd>{{ formatDuration(selectedPlan()!.duration_in_days) }}</dd>
+                                    <dt class="text-muted-foreground">
+                                        Duration
+                                    </dt>
+                                    <dd>
+                                        {{
+                                            formatDuration(
+                                                selectedPlan()!
+                                                    .duration_in_days,
+                                            )
+                                        }}
+                                    </dd>
                                 </div>
                                 <div v-if="selectedPlan()!.description">
-                                    <dt class="text-muted-foreground">Description</dt>
+                                    <dt class="text-muted-foreground">
+                                        Description
+                                    </dt>
                                     <dd>{{ selectedPlan()!.description }}</dd>
                                 </div>
                             </dl>
                         </div>
 
                         <div>
-                            <label for="start_date" class="block text-sm font-medium mb-2">Start Date *</label>
+                            <label
+                                for="start_date"
+                                class="mb-2 block text-sm font-medium"
+                                >Start Date *</label
+                            >
                             <input
                                 id="start_date"
                                 v-model="form.start_date"
                                 type="date"
                                 required
-                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                                :class="{ 'border-red-500': form.errors.start_date }"
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                :class="{
+                                    'border-red-500': form.errors.start_date,
+                                }"
                             />
-                            <p v-if="form.errors.start_date" class="mt-1 text-sm text-red-600">{{ form.errors.start_date }}</p>
+                            <p
+                                v-if="form.errors.start_date"
+                                class="mt-1 text-sm text-red-600"
+                            >
+                                {{ form.errors.start_date }}
+                            </p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium mb-2">Auto-Renew</label>
+                            <label class="mb-2 block text-sm font-medium"
+                                >Auto-Renew</label
+                            >
                             <div class="flex items-center gap-2">
                                 <input
                                     id="auto_renew"
@@ -152,13 +241,15 @@ const submit = () => {
                                     type="checkbox"
                                     class="rounded border-input"
                                 />
-                                <label for="auto_renew" class="text-sm">Automatically renew when expired</label>
+                                <label for="auto_renew" class="text-sm"
+                                    >Automatically renew when expired</label
+                                >
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex gap-4 justify-end">
+                <div class="flex justify-end gap-4">
                     <a
                         :href="`/members/${member.id}`"
                         class="inline-flex items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
@@ -170,7 +261,11 @@ const submit = () => {
                         :disabled="form.processing"
                         class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
                     >
-                        {{ form.processing ? 'Creating...' : 'Create Subscription' }}
+                        {{
+                            form.processing
+                                ? 'Creating...'
+                                : 'Create Subscription'
+                        }}
                     </button>
                 </div>
             </form>

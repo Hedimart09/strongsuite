@@ -45,31 +45,53 @@ defineProps<Props>();
             <div class="grid gap-6 md:grid-cols-2">
                 <!-- Basic Info -->
                 <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                    <h2 class="mb-4 text-lg font-semibold">Basic Information</h2>
+                    <h2 class="mb-4 text-lg font-semibold">
+                        Basic Information
+                    </h2>
                     <dl class="space-y-3">
                         <div>
-                            <dt class="text-sm text-gray-600 dark:text-gray-400">Name</dt>
+                            <dt
+                                class="text-sm text-gray-600 dark:text-gray-400"
+                            >
+                                Name
+                            </dt>
                             <dd class="font-medium">{{ staff.name }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm text-gray-600 dark:text-gray-400">Email</dt>
+                            <dt
+                                class="text-sm text-gray-600 dark:text-gray-400"
+                            >
+                                Email
+                            </dt>
                             <dd class="font-medium">{{ staff.email }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm text-gray-600 dark:text-gray-400">
+                            <dt
+                                class="text-sm text-gray-600 dark:text-gray-400"
+                            >
                                 Member Since
                             </dt>
-                            <dd class="font-medium">{{ new Date(staff.created_at).toLocaleDateString() }}</dd>
+                            <dd class="font-medium">
+                                {{
+                                    new Date(
+                                        staff.created_at,
+                                    ).toLocaleDateString()
+                                }}
+                            </dd>
                         </div>
                     </dl>
                 </div>
 
                 <!-- Roles & Permissions -->
                 <div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-                    <h2 class="mb-4 text-lg font-semibold">Roles & Permissions</h2>
+                    <h2 class="mb-4 text-lg font-semibold">
+                        Roles & Permissions
+                    </h2>
                     <div class="space-y-4">
                         <div>
-                            <h3 class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <h3
+                                class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
+                            >
                                 Roles
                             </h3>
                             <div class="flex flex-wrap gap-2">
@@ -83,10 +105,18 @@ defineProps<Props>();
                             </div>
                         </div>
                         <div>
-                            <h3 class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <h3
+                                class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
+                            >
                                 Permissions
                             </h3>
-                            <div v-if="staff.all_permissions && staff.all_permissions.length > 0" class="flex flex-wrap gap-2">
+                            <div
+                                v-if="
+                                    staff.all_permissions &&
+                                    staff.all_permissions.length > 0
+                                "
+                                class="flex flex-wrap gap-2"
+                            >
                                 <span
                                     v-for="permission in staff.all_permissions"
                                     :key="permission.name"
@@ -95,7 +125,10 @@ defineProps<Props>();
                                     {{ permission.name }}
                                 </span>
                             </div>
-                            <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic">
+                            <p
+                                v-else
+                                class="text-sm text-gray-500 italic dark:text-gray-400"
+                            >
                                 No permissions assigned
                             </p>
                         </div>

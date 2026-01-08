@@ -100,8 +100,8 @@ class MemberController extends Controller
     {
         $member->load([
             'subscriptions.membershipPlan',
-            'payments' => fn ($q) => $q->latest()->limit(10),
-            'attendances' => fn ($q) => $q->latest()->limit(10),
+            'payments' => fn ($q) => $q->latest('payment_date')->limit(10),
+            'attendances' => fn ($q) => $q->latest('check_in_time')->limit(10),
         ]);
 
         return Inertia::render('Members/Show', [

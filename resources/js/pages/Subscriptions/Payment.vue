@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import {
-    CreditCard,
-    User,
-    FileText,
     Calendar,
+    CreditCard,
     DollarSign,
+    FileText,
+    User,
     Wallet,
-    Building2,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
@@ -63,8 +68,14 @@ const processing = ref(false);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Members', href: '/members' },
-    { title: props.subscription.member.name, href: `/members/${props.subscription.member.id}` },
-    { title: 'Payment', href: `/subscriptions/${props.subscription.id}/payment` },
+    {
+        title: props.subscription.member.name,
+        href: `/members/${props.subscription.member.id}`,
+    },
+    {
+        title: 'Payment',
+        href: `/subscriptions/${props.subscription.id}/payment`,
+    },
 ];
 
 const formatCurrency = (amount: number) => {
@@ -107,7 +118,7 @@ const processOnlinePayment = () => {
             onFinish: () => {
                 processing.value = false;
             },
-        }
+        },
     );
 };
 
@@ -124,7 +135,9 @@ const canRecordManualPayment = () => {
         <div class="container mx-auto max-w-5xl space-y-6 px-4 py-8">
             <!-- Page Header -->
             <div class="space-y-2">
-                <h1 class="text-3xl font-bold tracking-tight">Subscription Payment</h1>
+                <h1 class="text-3xl font-bold tracking-tight">
+                    Subscription Payment
+                </h1>
                 <p class="text-muted-foreground">
                     Complete payment to activate subscription
                 </p>
@@ -143,11 +156,15 @@ const canRecordManualPayment = () => {
                         <div class="space-y-3">
                             <div class="flex items-start justify-between">
                                 <div class="space-y-1">
-                                    <p class="text-sm font-medium text-muted-foreground">
+                                    <p
+                                        class="text-sm font-medium text-muted-foreground"
+                                    >
                                         Member
                                     </p>
                                     <div class="flex items-center gap-2">
-                                        <User class="h-4 w-4 text-muted-foreground" />
+                                        <User
+                                            class="h-4 w-4 text-muted-foreground"
+                                        />
                                         <span class="font-medium">{{
                                             subscription.member.name
                                         }}</span>
@@ -159,25 +176,38 @@ const canRecordManualPayment = () => {
                             </div>
 
                             <div class="border-t pt-3">
-                                <p class="text-sm font-medium text-muted-foreground">
+                                <p
+                                    class="text-sm font-medium text-muted-foreground"
+                                >
                                     Membership Plan
                                 </p>
                                 <p class="font-medium">
                                     {{ subscription.membership_plan.name }}
                                 </p>
                                 <p class="text-sm text-muted-foreground">
-                                    {{ subscription.membership_plan.duration_in_days }} days
+                                    {{
+                                        subscription.membership_plan
+                                            .duration_in_days
+                                    }}
+                                    days
                                 </p>
                             </div>
 
                             <div class="border-t pt-3">
-                                <p class="text-sm font-medium text-muted-foreground">
+                                <p
+                                    class="text-sm font-medium text-muted-foreground"
+                                >
                                     Subscription Period
                                 </p>
                                 <div class="flex items-center gap-2">
-                                    <Calendar class="h-4 w-4 text-muted-foreground" />
+                                    <Calendar
+                                        class="h-4 w-4 text-muted-foreground"
+                                    />
                                     <span class="text-sm">
-                                        {{ formatDate(subscription.start_date) }} -
+                                        {{
+                                            formatDate(subscription.start_date)
+                                        }}
+                                        -
                                         {{ formatDate(subscription.end_date) }}
                                     </span>
                                 </div>
@@ -197,7 +227,9 @@ const canRecordManualPayment = () => {
                     <CardContent class="space-y-4">
                         <div class="space-y-3">
                             <div>
-                                <p class="text-sm font-medium text-muted-foreground">
+                                <p
+                                    class="text-sm font-medium text-muted-foreground"
+                                >
                                     Invoice Number
                                 </p>
                                 <p class="font-mono font-medium">
@@ -206,24 +238,42 @@ const canRecordManualPayment = () => {
                             </div>
 
                             <div class="border-t pt-3">
-                                <p class="text-sm font-medium text-muted-foreground">Due Date</p>
+                                <p
+                                    class="text-sm font-medium text-muted-foreground"
+                                >
+                                    Due Date
+                                </p>
                                 <div class="flex items-center gap-2">
-                                    <Calendar class="h-4 w-4 text-muted-foreground" />
-                                    <span>{{ formatDate(invoice.due_date) }}</span>
+                                    <Calendar
+                                        class="h-4 w-4 text-muted-foreground"
+                                    />
+                                    <span>{{
+                                        formatDate(invoice.due_date)
+                                    }}</span>
                                 </div>
                             </div>
 
                             <div class="space-y-2 border-t pt-3">
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-muted-foreground">Subtotal</span>
-                                    <span>{{ formatCurrency(invoice.subtotal) }}</span>
+                                <div
+                                    class="flex items-center justify-between text-sm"
+                                >
+                                    <span class="text-muted-foreground"
+                                        >Subtotal</span
+                                    >
+                                    <span>{{
+                                        formatCurrency(invoice.subtotal)
+                                    }}</span>
                                 </div>
                                 <div
                                     v-if="invoice.tax_amount > 0"
                                     class="flex items-center justify-between text-sm"
                                 >
-                                    <span class="text-muted-foreground">Tax</span>
-                                    <span>{{ formatCurrency(invoice.tax_amount) }}</span>
+                                    <span class="text-muted-foreground"
+                                        >Tax</span
+                                    >
+                                    <span>{{
+                                        formatCurrency(invoice.tax_amount)
+                                    }}</span>
                                 </div>
                                 <div
                                     class="flex items-center justify-between border-t pt-2 text-lg font-bold"
@@ -231,7 +281,9 @@ const canRecordManualPayment = () => {
                                     <span>Total</span>
                                     <div class="flex items-center gap-2">
                                         <DollarSign class="h-5 w-5" />
-                                        <span>{{ formatCurrency(invoice.total_amount) }}</span>
+                                        <span>{{
+                                            formatCurrency(invoice.total_amount)
+                                        }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -248,7 +300,8 @@ const canRecordManualPayment = () => {
                         Select Payment Method
                     </CardTitle>
                     <CardDescription>
-                        Choose your preferred payment gateway to complete the transaction
+                        Choose your preferred payment gateway to complete the
+                        transaction
                     </CardDescription>
                 </CardHeader>
                 <CardContent class="space-y-6">
@@ -258,9 +311,11 @@ const canRecordManualPayment = () => {
                             <select
                                 id="gateway"
                                 v-model="selectedGateway"
-                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                             >
-                                <option value="" disabled>Select a payment gateway</option>
+                                <option value="" disabled>
+                                    Select a payment gateway
+                                </option>
                                 <option
                                     v-for="gateway in available_gateways"
                                     :key="gateway"
@@ -287,21 +342,19 @@ const canRecordManualPayment = () => {
                     </div>
 
                     <!-- Manual Payment Option (Staff Only) -->
-                    <div
-                        v-if="canRecordManualPayment()"
-                        class="border-t pt-6"
-                    >
+                    <div v-if="canRecordManualPayment()" class="border-t pt-6">
                         <div class="space-y-2">
                             <h3 class="text-sm font-medium">Staff Actions</h3>
                             <p class="text-sm text-muted-foreground">
-                                If payment was received in person, you can record it manually.
+                                If payment was received in person, you can
+                                record it manually.
                             </p>
                             <Button
                                 variant="outline"
                                 size="sm"
                                 @click="
                                     router.visit(
-                                        `/subscriptions/${subscription.id}/payment/manual`
+                                        `/subscriptions/${subscription.id}/payment/manual`,
                                     )
                                 "
                             >
@@ -313,17 +366,24 @@ const canRecordManualPayment = () => {
             </Card>
 
             <!-- Payment Information -->
-            <Card class="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
+            <Card
+                class="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950"
+            >
                 <CardContent class="pt-6">
                     <div class="space-y-2">
                         <h3 class="font-medium">Payment Information</h3>
-                        <ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                            <li>Your subscription will be activated immediately after payment</li>
+                        <ul
+                            class="list-disc space-y-1 pl-5 text-sm text-muted-foreground"
+                        >
+                            <li>
+                                Your subscription will be activated immediately
+                                after payment
+                            </li>
                             <li>You will receive a receipt via email</li>
                             <li>All payments are secure and encrypted</li>
                             <li>
-                                Supported payment methods: Card, Mobile Money (MTN, Vodafone,
-                                AirtelTigo)
+                                Supported payment methods: Card, Mobile Money
+                                (MTN, Vodafone, AirtelTigo)
                             </li>
                         </ul>
                     </div>

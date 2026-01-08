@@ -35,31 +35,38 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Staff', href: '/staff' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Staff', href: '/staff' }];
 
 const role = ref(props.filters.role || '');
 const search = ref(props.filters.search || '');
 
-watch([role, search], () => {
-    const params: Record<string, string> = {};
-    if (role.value) params.role = role.value;
-    if (search.value) params.search = search.value;
+watch(
+    [role, search],
+    () => {
+        const params: Record<string, string> = {};
+        if (role.value) params.role = role.value;
+        if (search.value) params.search = search.value;
 
-    router.get('/staff', params, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-}, { debounce: 300 });
+        router.get('/staff', params, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    },
+    { debounce: 300 },
+);
 
 const getRoleClass = (roleName: string) => {
     const classes: Record<string, string> = {
-        'Admin': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-        'Receptionist': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-        'Trainer': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+        Admin: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+        Receptionist:
+            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+        Trainer:
+            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     };
-    return classes[roleName] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    return (
+        classes[roleName] ||
+        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+    );
 };
 </script>
 
@@ -67,62 +74,92 @@ const getRoleClass = (roleName: string) => {
     <Head title="Staff" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6">
+        <div
+            class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4 md:p-6"
+        >
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Staff</h1>
-                <p class="text-sm text-muted-foreground mt-1">
+                <p class="mt-1 text-sm text-muted-foreground">
                     Manage staff members and their roles
                 </p>
             </div>
 
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-4">
+            <div
+                class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border"
+            >
                 <div class="grid gap-4 md:grid-cols-3">
                     <div>
-                        <label for="role" class="block text-sm font-medium mb-2">Role</label>
+                        <label for="role" class="mb-2 block text-sm font-medium"
+                            >Role</label
+                        >
                         <select
                             id="role"
                             v-model="role"
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         >
                             <option value="">All Roles</option>
-                            <option v-for="r in roles" :key="r.id" :value="r.name">
+                            <option
+                                v-for="r in roles"
+                                :key="r.id"
+                                :value="r.name"
+                            >
                                 {{ r.name }}
                             </option>
                         </select>
                     </div>
 
                     <div class="md:col-span-2">
-                        <label for="search" class="block text-sm font-medium mb-2">Search</label>
+                        <label
+                            for="search"
+                            class="mb-2 block text-sm font-medium"
+                            >Search</label
+                        >
                         <input
                             id="search"
                             v-model="search"
                             type="text"
                             placeholder="Search by name or email..."
-                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                         />
                     </div>
                 </div>
             </div>
 
-            <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border overflow-hidden">
+            <div
+                class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
+            >
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-sidebar-border bg-sidebar">
+                        <thead
+                            class="border-b border-sidebar-border bg-sidebar"
+                        >
                             <tr>
-                                <th class="px-4 py-3 text-left font-medium">Name</th>
-                                <th class="px-4 py-3 text-left font-medium">Email</th>
-                                <th class="px-4 py-3 text-left font-medium">Role</th>
-                                <th class="px-4 py-3 text-left font-medium">Joined</th>
-                                <th class="px-4 py-3 text-left font-medium">Actions</th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Name
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Email
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Role
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Joined
+                                </th>
+                                <th class="px-4 py-3 text-left font-medium">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-sidebar-border/50">
                             <tr
                                 v-for="member in staff.data"
                                 :key="member.id"
-                                class="hover:bg-sidebar/50 transition-colors"
+                                class="transition-colors hover:bg-sidebar/50"
                             >
-                                <td class="px-4 py-3 font-medium">{{ member.name }}</td>
+                                <td class="px-4 py-3 font-medium">
+                                    {{ member.name }}
+                                </td>
                                 <td class="px-4 py-3">{{ member.email }}</td>
                                 <td class="px-4 py-3">
                                     <span
@@ -134,7 +171,13 @@ const getRoleClass = (roleName: string) => {
                                         {{ r.name }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3">{{ new Date(member.created_at).toLocaleDateString() }}</td>
+                                <td class="px-4 py-3">
+                                    {{
+                                        new Date(
+                                            member.created_at,
+                                        ).toLocaleDateString()
+                                    }}
+                                </td>
                                 <td class="px-4 py-3">
                                     <div class="flex gap-2">
                                         <a
@@ -153,7 +196,10 @@ const getRoleClass = (roleName: string) => {
                                 </td>
                             </tr>
                             <tr v-if="staff.data.length === 0">
-                                <td colspan="5" class="px-4 py-8 text-center text-muted-foreground">
+                                <td
+                                    colspan="5"
+                                    class="px-4 py-8 text-center text-muted-foreground"
+                                >
                                     No staff members found
                                 </td>
                             </tr>
@@ -163,11 +209,17 @@ const getRoleClass = (roleName: string) => {
 
                 <div
                     v-if="staff.last_page > 1"
-                    class="border-t border-sidebar-border px-4 py-3 flex items-center justify-between"
+                    class="flex items-center justify-between border-t border-sidebar-border px-4 py-3"
                 >
                     <div class="text-sm text-muted-foreground">
-                        Showing {{ ((staff.current_page - 1) * staff.per_page) + 1 }}
-                        to {{ Math.min(staff.current_page * staff.per_page, staff.total) }}
+                        Showing
+                        {{ (staff.current_page - 1) * staff.per_page + 1 }} to
+                        {{
+                            Math.min(
+                                staff.current_page * staff.per_page,
+                                staff.total,
+                            )
+                        }}
                         of {{ staff.total }} records
                     </div>
                     <div class="flex gap-2">
@@ -179,9 +231,9 @@ const getRoleClass = (roleName: string) => {
                                 link.active
                                     ? 'bg-primary text-primary-foreground'
                                     : 'bg-sidebar hover:bg-sidebar-accent',
-                                !link.url && 'opacity-50 cursor-not-allowed',
+                                !link.url && 'cursor-not-allowed opacity-50',
                             ]"
-                            class="px-3 py-1 rounded text-sm"
+                            class="rounded px-3 py-1 text-sm"
                             v-html="link.label"
                         />
                     </div>

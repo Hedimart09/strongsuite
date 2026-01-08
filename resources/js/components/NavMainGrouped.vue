@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarMenu,
@@ -9,7 +14,6 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import { urlIsActive } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronRight } from 'lucide-vue-next';
@@ -71,7 +75,12 @@ const page = usePage();
                                     >
                                         <SidebarMenuSubButton
                                             as-child
-                                            :is-active="urlIsActive(subItem.href, page.url)"
+                                            :is-active="
+                                                urlIsActive(
+                                                    subItem.href,
+                                                    page.url,
+                                                )
+                                            "
                                         >
                                             <Link :href="subItem.href">
                                                 <span>{{ subItem.title }}</span>
