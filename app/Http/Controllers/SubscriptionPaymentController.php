@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RecordManualPaymentRequest;
+use App\Mail\PaymentLinkMail;
 use App\Models\Subscription;
 use App\Services\InvoiceService;
 use App\Services\PaymentService;
 use App\Services\SubscriptionStatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class SubscriptionPaymentController extends Controller
@@ -75,16 +77,49 @@ class SubscriptionPaymentController extends Controller
                 'pending_subscription_id' => $subscription->id,
             ]);
 
-            return redirect($result['authorization_url']);
+            // Send payment link to member's email
+            Mail::to($subscription->member->email)->send(
+                new PaymentLinkMail(
+                    member: $subscription->member,
+                    subscription: $subscription,
+                    paymentLink: $result['authorization_url'],
+                    amount: $invoice->total_amount,
+                    currency: $invoice->currency
+                )
+            );
+
+            return redirect()->back()
+                ->with('success', 'Payment link has been sent to '.$subscription->member->email);
         }
 
         return redirect()->back()
             ->with('error', $result['message'] ?? 'Payment initialization failed');
     }
 
+    public function showManualPaymentForm(Subscription $subscription)
+    {
+        $subscription->load(['member', 'membershipPlan', 'invoices']);
+
+        // Get or create invoice for this subscription
+        $invoice = $subscription->invoices()->where('status', '!=', 'paid')->first();
+
+        if (! $invoice) {
+            $invoice = $this->invoiceService->generateInvoiceForSubscription($subscription);
+        }
+
+        return Inertia::render('Subscriptions/ManualPayment', [
+            'subscription' => $subscription,
+            'invoice' => $invoice,
+        ]);
+    }
+
     public function processManual(Subscription $subscription, RecordManualPaymentRequest $request)
     {
-        $data = $request->validated();
+        // Merge subscription data into validated request data
+        $data = array_merge($request->validated(), [
+            'member_id' => $subscription->member_id,
+            'subscription_id' => $subscription->id,
+        ]);
 
         $payment = DB::transaction(function () use ($subscription, $data) {
             $subscription->load('membershipPlan');
@@ -97,8 +132,8 @@ class SubscriptionPaymentController extends Controller
 
             // Record manual payment
             $payment = $this->paymentService->recordManualPayment([
-                'member_id' => $subscription->member_id,
-                'subscription_id' => $subscription->id,
+                'member_id' => $data['member_id'],
+                'subscription_id' => $data['subscription_id'],
                 'amount' => $data['amount'],
                 'currency' => $data['currency'] ?? 'GHS',
                 'payment_method' => $data['payment_method'],

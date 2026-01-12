@@ -260,14 +260,14 @@ class PaymentController extends Controller
     {
         $payment->load(['member', 'subscription.membershipPlan', 'invoice']);
 
-        return Inertia::render('Payments/Success', [
+        return Inertia::render('Payments/PublicSuccess', [
             'payment' => $payment,
         ]);
     }
 
     public function failed()
     {
-        return Inertia::render('Payments/Failed', [
+        return Inertia::render('Payments/PublicFailed', [
             'error' => session('error'),
         ]);
     }

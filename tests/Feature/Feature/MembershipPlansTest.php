@@ -248,17 +248,29 @@ it('can renew a subscription', function () {
 
     $response = $this->post("/subscriptions/{$subscription->id}/renew");
 
-    $response->assertRedirect("/members/{$member->id}");
-
     $newSubscription = Subscription::where('member_id', $member->id)
         ->where('id', '!=', $subscription->id)
         ->first();
 
-    expect($newSubscription)->not->toBeNull()
-        ->and($newSubscription->status)->toBe('active');
+    expect($newSubscription)->not->toBeNull();
 
+    // Should redirect to payment page (pay-first approach)
+    $response->assertRedirect("/subscriptions/{$newSubscription->id}/payment");
+
+    // New subscription should be pending payment
+    $expectedStartDate = $subscription->end_date->copy()->addDay();
+    $expectedEndDate = $expectedStartDate->copy()->addDays($plan->duration_in_days);
+
+    expect($newSubscription->status)->toBe('pending_payment')
+        ->and($newSubscription->start_date->toDateString())->toBe($expectedStartDate->toDateString())
+        ->and($newSubscription->end_date->toDateString())->toBe($expectedEndDate->toDateString());
+
+    // Invoice should be generated
+    expect($newSubscription->invoices()->count())->toBe(1);
+
+    // Old subscription should still be active (will be marked expired after payment)
     $subscription->refresh();
-    expect($subscription->status)->toBe('expired');
+    expect($subscription->status)->toBe('active');
 });
 
 it('can cancel a subscription', function () {

@@ -7,10 +7,10 @@ use Laravel\Fortify\Features;
 
 // Serve storage files (needed for php artisan serve)
 Route::get('storage/{path}', function ($path) {
-    $filePath = storage_path('app/public/' . $path);
+    $filePath = storage_path('app/public/'.$path);
 
-    if (!file_exists($filePath)) {
-        \Log::error('Storage file not found: ' . $filePath);
+    if (! file_exists($filePath)) {
+        \Log::error('Storage file not found: '.$filePath);
         abort(404);
     }
 
@@ -104,6 +104,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('subscriptions/{subscription}/renew', [\App\Http\Controllers\SubscriptionController::class, 'renew'])->name('subscriptions.renew');
         Route::post('subscriptions/{subscription}/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
     });
+    Route::middleware('permission:payments.create')->group(function () {
+        Route::get('subscriptions/{subscription}/renew/manual', [\App\Http\Controllers\SubscriptionController::class, 'renewManual'])->name('subscriptions.renew.manual.form');
+        Route::post('subscriptions/{subscription}/renew/manual', [\App\Http\Controllers\SubscriptionController::class, 'processManualRenewal'])->name('subscriptions.renew.manual');
+    });
 
     // Subscription Payment routes
     Route::middleware('permission:subscriptions.view')->group(function () {
@@ -111,6 +115,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::middleware('permission:payments.create')->group(function () {
         Route::post('subscriptions/{subscription}/payment/online', [\App\Http\Controllers\SubscriptionPaymentController::class, 'processOnline'])->name('subscriptions.payment.online');
+        Route::get('subscriptions/{subscription}/payment/manual', [\App\Http\Controllers\SubscriptionPaymentController::class, 'showManualPaymentForm'])->name('subscriptions.payment.manual.form');
         Route::post('subscriptions/{subscription}/payment/manual', [\App\Http\Controllers\SubscriptionPaymentController::class, 'processManual'])->name('subscriptions.payment.manual');
     });
 
@@ -123,11 +128,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('payments/initialize', [\App\Http\Controllers\PaymentController::class, 'initialize'])->name('payments.initialize');
         Route::post('payments/manual', [\App\Http\Controllers\PaymentController::class, 'recordManual'])->name('payments.manual');
     });
-
-    // Public payment verification and result pages (no permission required)
-    Route::get('payments/verify/{gateway}', [\App\Http\Controllers\PaymentController::class, 'verify'])->name('payments.verify');
-    Route::get('payments/{payment}/success', [\App\Http\Controllers\PaymentController::class, 'success'])->name('payments.success');
-    Route::get('payments/failed', [\App\Http\Controllers\PaymentController::class, 'failed'])->name('payments.failed');
 
     // Attendance routes
     Route::middleware('permission:attendance.view')->group(function () {
@@ -170,6 +170,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::delete('staff/{staff}', [\App\Http\Controllers\StaffController::class, 'destroy'])->middleware('permission:staff.delete')->name('staff.destroy');
 });
+
+// Public payment verification and result pages (no auth required)
+Route::get('payments/verify/{gateway}', [\App\Http\Controllers\PaymentController::class, 'verify'])->name('payments.verify');
+Route::get('payments/{payment}/success', [\App\Http\Controllers\PaymentController::class, 'success'])->name('payments.success');
+Route::get('payments/failed', [\App\Http\Controllers\PaymentController::class, 'failed'])->name('payments.failed');
 
 // Webhook routes (outside auth middleware, CSRF will be exempted)
 Route::post('webhooks/{gateway}/payment', [\App\Http\Controllers\PaymentController::class, 'webhook'])->name('webhooks.payment');

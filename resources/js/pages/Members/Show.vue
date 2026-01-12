@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 
 interface Subscription {
     id: number;
@@ -57,6 +57,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -68,6 +69,11 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: `/members/${props.member.id}`,
     },
 ];
+
+const canRecordManualPayment = () => {
+    const userPermissions = page.props.auth?.user?.permissions || [];
+    return userPermissions.includes('payments.create');
+};
 
 const getStatusClass = (status: string) => {
     return status === 'active'
@@ -338,50 +344,57 @@ const formatCurrency = (amount: number, currency: string) => {
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <div class="flex gap-2">
-                                        <form
+                                    <div class="flex flex-wrap gap-2">
+                                        <button
                                             v-if="
                                                 subscription.status === 'active'
                                             "
-                                            :action="`/subscriptions/${subscription.id}/renew`"
-                                            method="post"
-                                            class="inline"
+                                            @click="
+                                                router.post(
+                                                    `/subscriptions/${subscription.id}/renew`,
+                                                )
+                                            "
+                                            class="text-sm text-primary hover:text-primary/80"
+                                            title="Send payment link to member"
                                         >
-                                            <button
-                                                type="submit"
-                                                class="text-sm text-primary hover:text-primary/80"
-                                            >
-                                                Renew
-                                            </button>
-                                        </form>
-                                        <form
+                                            Send Payment Link
+                                        </button>
+                                        <button
+                                            v-if="
+                                                subscription.status === 'active' &&
+                                                canRecordManualPayment()
+                                            "
+                                            @click="
+                                                router.visit(
+                                                    `/subscriptions/${subscription.id}/renew/manual`,
+                                                )
+                                            "
+                                            class="text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-500"
+                                            title="Record manual payment for renewal"
+                                        >
+                                            Record Payment
+                                        </button>
+                                        <button
                                             v-if="
                                                 subscription.status === 'active'
                                             "
-                                            :action="`/subscriptions/${subscription.id}/cancel`"
-                                            method="post"
-                                            class="inline"
-                                            @submit.prevent="
-                                                (e) => {
+                                            @click="
+                                                () => {
                                                     if (
                                                         confirm(
                                                             'Are you sure you want to cancel this subscription?',
                                                         )
                                                     ) {
-                                                        (
-                                                            e.target as HTMLFormElement
-                                                        ).submit();
+                                                        router.post(
+                                                            `/subscriptions/${subscription.id}/cancel`,
+                                                        );
                                                     }
                                                 }
                                             "
+                                            class="text-sm text-red-500 hover:text-red-600"
                                         >
-                                            <button
-                                                type="submit"
-                                                class="text-sm text-red-500 hover:text-red-600"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </form>
+                                            Cancel
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

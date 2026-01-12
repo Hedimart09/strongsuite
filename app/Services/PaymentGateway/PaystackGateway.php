@@ -26,7 +26,7 @@ class PaystackGateway implements PaymentGatewayInterface
             'Content-Type' => 'application/json',
         ])->post("{$this->baseUrl}/transaction/initialize", [
             'email' => $data['email'],
-            'amount' => $data['amount'] * 100, // Convert to kobo/pesewas
+            'amount' => $data['amount'], // Amount already in minor units (pesewas/kobo)
             'currency' => $data['currency'] ?? 'GHS',
             'reference' => $data['reference'] ?? $this->generateReference(),
             'callback_url' => $data['callback_url'] ?? null,
@@ -64,7 +64,7 @@ class PaystackGateway implements PaymentGatewayInterface
             return [
                 'status' => 'success',
                 'data' => $response->json()['data'],
-                'amount' => $response->json()['data']['amount'] / 100, // Convert from kobo/pesewas
+                'amount' => $response->json()['data']['amount'], // Keep in minor units
                 'currency' => $response->json()['data']['currency'],
                 'reference' => $response->json()['data']['reference'],
                 'paid_at' => $response->json()['data']['paid_at'],
@@ -94,7 +94,7 @@ class PaystackGateway implements PaymentGatewayInterface
                 'status' => 'success',
                 'event' => 'payment_completed',
                 'reference' => $data['reference'],
-                'amount' => $data['amount'] / 100,
+                'amount' => $data['amount'], // Keep in minor units
                 'currency' => $data['currency'],
                 'customer_email' => $data['customer']['email'],
                 'paid_at' => $data['paid_at'],

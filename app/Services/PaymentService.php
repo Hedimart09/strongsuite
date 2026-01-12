@@ -66,26 +66,42 @@ class PaymentService
             ];
         }
 
-        $result = $gatewayInstance->initializePayment($data);
+        return DB::transaction(function () use ($gatewayInstance, $gateway, $data) {
+            // Cancel any existing pending payments for this subscription
+            if (isset($data['subscription_id'])) {
+                Payment::where('subscription_id', $data['subscription_id'])
+                    ->where('status', 'pending')
+                    ->update([
+                        'status' => 'cancelled',
+                        'metadata' => DB::raw("JSON_SET(COALESCE(metadata, '{}'), '$.cancelled_reason', 'New payment initialized', '$.cancelled_at', '".now()->toIso8601String()."')"),
+                    ]);
 
-        if ($result['status'] === 'success') {
-            Payment::create([
-                'member_id' => $data['member_id'],
-                'subscription_id' => $data['subscription_id'] ?? null,
-                'amount' => $data['amount'],
-                'currency' => $data['currency'] ?? 'GHS',
-                'payment_method' => $gateway,
-                'payment_gateway' => $gateway,
-                'transaction_id' => $result['reference'],
-                'status' => 'pending',
-                'payment_date' => null,
-                'metadata' => array_merge($data['metadata'] ?? [], [
-                    'authorization_url' => $result['authorization_url'] ?? null,
-                ]),
-            ]);
-        }
+                Log::info('Cancelled pending payments for subscription', [
+                    'subscription_id' => $data['subscription_id'],
+                ]);
+            }
 
-        return $result;
+            $result = $gatewayInstance->initializePayment($data);
+
+            if ($result['status'] === 'success') {
+                Payment::create([
+                    'member_id' => $data['member_id'],
+                    'subscription_id' => $data['subscription_id'] ?? null,
+                    'amount' => $data['amount'],
+                    'currency' => $data['currency'] ?? 'GHS',
+                    'payment_method' => $gateway,
+                    'payment_gateway' => $gateway,
+                    'transaction_id' => $result['reference'],
+                    'status' => 'pending',
+                    'payment_date' => null,
+                    'metadata' => array_merge($data['metadata'] ?? [], [
+                        'authorization_url' => $result['authorization_url'] ?? null,
+                    ]),
+                ]);
+            }
+
+            return $result;
+        });
     }
 
     public function verifyAndRecordPayment(string $gateway, string $reference): array
@@ -105,26 +121,71 @@ class PaymentService
             return DB::transaction(function () use ($reference, $result) {
                 $payment = Payment::where('transaction_id', $reference)->first();
 
-                if ($payment) {
-                    $payment->update([
-                        'status' => 'completed',
-                        'payment_date' => now(),
-                        'metadata' => array_merge($payment->metadata ?? [], [
-                            'verified_at' => now()->toIso8601String(),
-                            'verification_data' => $result['data'] ?? [],
-                        ]),
+                if (! $payment) {
+                    return [
+                        'status' => 'error',
+                        'message' => 'Payment record not found',
+                    ];
+                }
+
+                // Check if payment is already completed
+                if ($payment->status === 'completed') {
+                    Log::info('Payment already completed', [
+                        'payment_id' => $payment->id,
+                        'transaction_id' => $reference,
                     ]);
 
                     return [
                         'status' => 'success',
                         'payment' => $payment,
-                        'message' => 'Payment verified and recorded successfully',
+                        'message' => 'Payment already verified',
                     ];
                 }
 
+                // Check if another payment for this subscription was already completed
+                if ($payment->subscription_id) {
+                    $existingCompletedPayment = Payment::where('subscription_id', $payment->subscription_id)
+                        ->where('status', 'completed')
+                        ->where('id', '!=', $payment->id)
+                        ->first();
+
+                    if ($existingCompletedPayment) {
+                        Log::warning('Duplicate payment attempt detected', [
+                            'new_payment_id' => $payment->id,
+                            'existing_payment_id' => $existingCompletedPayment->id,
+                            'subscription_id' => $payment->subscription_id,
+                        ]);
+
+                        // Mark this payment as duplicate
+                        $payment->update([
+                            'status' => 'refunded',
+                            'metadata' => array_merge($payment->metadata ?? [], [
+                                'duplicate_of' => $existingCompletedPayment->id,
+                                'marked_at' => now()->toIso8601String(),
+                                'note' => 'Duplicate payment - subscription already paid',
+                            ]),
+                        ]);
+
+                        return [
+                            'status' => 'error',
+                            'message' => 'This subscription has already been paid. Please contact support for a refund.',
+                        ];
+                    }
+                }
+
+                $payment->update([
+                    'status' => 'completed',
+                    'payment_date' => now(),
+                    'metadata' => array_merge($payment->metadata ?? [], [
+                        'verified_at' => now()->toIso8601String(),
+                        'verification_data' => $result['data'] ?? [],
+                    ]),
+                ]);
+
                 return [
-                    'status' => 'error',
-                    'message' => 'Payment record not found',
+                    'status' => 'success',
+                    'payment' => $payment,
+                    'message' => 'Payment verified and recorded successfully',
                 ];
             });
         }
@@ -149,32 +210,77 @@ class PaymentService
             return DB::transaction(function () use ($result) {
                 $payment = Payment::where('transaction_id', $result['reference'])->first();
 
-                if ($payment) {
-                    $payment->update([
-                        'status' => 'completed',
-                        'payment_date' => $result['paid_at'] ?? now(),
-                        'metadata' => array_merge($payment->metadata ?? [], [
-                            'webhook_processed_at' => now()->toIso8601String(),
-                            'webhook_data' => $result,
-                        ]),
-                    ]);
+                if (! $payment) {
+                    return [
+                        'status' => 'error',
+                        'message' => 'Payment record not found',
+                    ];
+                }
 
-                    Log::info('Payment completed via webhook', [
+                // Check if payment is already completed (duplicate webhook)
+                if ($payment->status === 'completed') {
+                    Log::info('Duplicate webhook received for completed payment', [
                         'payment_id' => $payment->id,
                         'reference' => $result['reference'],
-                        'amount' => $result['amount'],
                     ]);
 
                     return [
                         'status' => 'success',
                         'payment' => $payment,
-                        'message' => 'Payment processed successfully',
+                        'message' => 'Payment already processed',
                     ];
                 }
 
+                // Check if another payment for this subscription was already completed
+                if ($payment->subscription_id) {
+                    $existingCompletedPayment = Payment::where('subscription_id', $payment->subscription_id)
+                        ->where('status', 'completed')
+                        ->where('id', '!=', $payment->id)
+                        ->first();
+
+                    if ($existingCompletedPayment) {
+                        Log::warning('Duplicate payment detected via webhook', [
+                            'new_payment_id' => $payment->id,
+                            'existing_payment_id' => $existingCompletedPayment->id,
+                            'subscription_id' => $payment->subscription_id,
+                        ]);
+
+                        // Mark as duplicate
+                        $payment->update([
+                            'status' => 'refunded',
+                            'metadata' => array_merge($payment->metadata ?? [], [
+                                'duplicate_of' => $existingCompletedPayment->id,
+                                'marked_at' => now()->toIso8601String(),
+                                'note' => 'Duplicate payment - subscription already paid',
+                            ]),
+                        ]);
+
+                        return [
+                            'status' => 'error',
+                            'message' => 'Duplicate payment detected',
+                        ];
+                    }
+                }
+
+                $payment->update([
+                    'status' => 'completed',
+                    'payment_date' => $result['paid_at'] ?? now(),
+                    'metadata' => array_merge($payment->metadata ?? [], [
+                        'webhook_processed_at' => now()->toIso8601String(),
+                        'webhook_data' => $result,
+                    ]),
+                ]);
+
+                Log::info('Payment completed via webhook', [
+                    'payment_id' => $payment->id,
+                    'reference' => $result['reference'],
+                    'amount' => $result['amount'],
+                ]);
+
                 return [
-                    'status' => 'error',
-                    'message' => 'Payment record not found',
+                    'status' => 'success',
+                    'payment' => $payment,
+                    'message' => 'Payment processed successfully',
                 ];
             });
         }
