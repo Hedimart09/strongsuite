@@ -47,6 +47,9 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Cache bust - forces rebuild when code changes
+ARG CACHEBUST=1
+
 # Copy application files
 COPY . .
 
