@@ -361,7 +361,8 @@ const formatCurrency = (amount: number, currency: string) => {
                                         </button>
                                         <button
                                             v-if="
-                                                subscription.status === 'active' &&
+                                                subscription.status ===
+                                                    'active' &&
                                                 canRecordManualPayment()
                                             "
                                             @click="

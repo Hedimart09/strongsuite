@@ -171,10 +171,10 @@
     }
     a,
     button,
-    [role="button"],
-    [type="button"],
-    [type="submit"],
-    [type="reset"] {
+    [role='button'],
+    [type='button'],
+    [type='submit'],
+    [type='reset'] {
         @apply cursor-pointer;
     }
 }

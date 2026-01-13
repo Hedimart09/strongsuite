@@ -410,9 +410,7 @@ const currentIcon = computed(() => {
                                             <p
                                                 class="text-sm text-muted-foreground"
                                             >
-                                                {{
-                                                    item.payment_count
-                                                }}
+                                                {{ item.payment_count }}
                                                 payments
                                             </p>
                                         </div>

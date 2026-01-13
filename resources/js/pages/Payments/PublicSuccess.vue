@@ -49,83 +49,143 @@ const formatDate = (dateString: string) => {
 <template>
     <Head title="Payment Successful" />
 
-    <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-        <div class="container mx-auto flex min-h-screen items-center justify-center px-4 py-16">
+    <div
+        class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800"
+    >
+        <div
+            class="container mx-auto flex min-h-screen items-center justify-center px-4 py-16"
+        >
             <div class="w-full max-w-2xl">
                 <!-- Success Icon -->
                 <div class="mb-8 text-center">
-                    <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-                        <CheckCircle2 class="h-12 w-12 text-green-600 dark:text-green-400" />
+                    <div
+                        class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900"
+                    >
+                        <CheckCircle2
+                            class="h-12 w-12 text-green-600 dark:text-green-400"
+                        />
                     </div>
-                    <h1 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+                    <h1
+                        class="mb-2 text-3xl font-bold text-gray-900 dark:text-white"
+                    >
                         Payment Successful!
                     </h1>
                     <p class="text-gray-600 dark:text-gray-400">
-                        Thank you for your payment. Your subscription has been activated.
+                        Thank you for your payment. Your subscription has been
+                        activated.
                     </p>
                 </div>
 
                 <!-- Payment Details Card -->
                 <div class="rounded-xl bg-white p-8 shadow-lg dark:bg-gray-800">
-                    <h2 class="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
+                    <h2
+                        class="mb-6 text-xl font-semibold text-gray-900 dark:text-white"
+                    >
                         Payment Details
                     </h2>
 
                     <div class="space-y-4">
-                        <div class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
-                            <span class="text-gray-600 dark:text-gray-400">Amount Paid</span>
-                            <span class="font-semibold text-gray-900 dark:text-white">
-                                {{ formatCurrency(payment.amount, payment.currency) }}
+                        <div
+                            class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700"
+                        >
+                            <span class="text-gray-600 dark:text-gray-400"
+                                >Amount Paid</span
+                            >
+                            <span
+                                class="font-semibold text-gray-900 dark:text-white"
+                            >
+                                {{
+                                    formatCurrency(
+                                        payment.amount,
+                                        payment.currency,
+                                    )
+                                }}
                             </span>
                         </div>
 
-                        <div class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
-                            <span class="text-gray-600 dark:text-gray-400">Transaction ID</span>
-                            <span class="font-mono text-sm text-gray-900 dark:text-white">
+                        <div
+                            class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700"
+                        >
+                            <span class="text-gray-600 dark:text-gray-400"
+                                >Transaction ID</span
+                            >
+                            <span
+                                class="font-mono text-sm text-gray-900 dark:text-white"
+                            >
                                 {{ payment.transaction_id }}
                             </span>
                         </div>
 
-                        <div class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
-                            <span class="text-gray-600 dark:text-gray-400">Payment Method</span>
+                        <div
+                            class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700"
+                        >
+                            <span class="text-gray-600 dark:text-gray-400"
+                                >Payment Method</span
+                            >
                             <span class="text-gray-900 dark:text-white">
                                 {{ payment.payment_method }}
                             </span>
                         </div>
 
-                        <div class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
-                            <span class="text-gray-600 dark:text-gray-400">Date & Time</span>
+                        <div
+                            class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700"
+                        >
+                            <span class="text-gray-600 dark:text-gray-400"
+                                >Date & Time</span
+                            >
                             <span class="text-gray-900 dark:text-white">
                                 {{ formatDate(payment.payment_date) }}
                             </span>
                         </div>
 
-                        <div v-if="payment.subscription" class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700">
-                            <span class="text-gray-600 dark:text-gray-400">Membership Plan</span>
+                        <div
+                            v-if="payment.subscription"
+                            class="flex justify-between border-b border-gray-200 pb-3 dark:border-gray-700"
+                        >
+                            <span class="text-gray-600 dark:text-gray-400"
+                                >Membership Plan</span
+                            >
                             <span class="text-gray-900 dark:text-white">
                                 {{ payment.subscription.membership_plan.name }}
                             </span>
                         </div>
 
                         <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Member</span>
+                            <span class="text-gray-600 dark:text-gray-400"
+                                >Member</span
+                            >
                             <div class="text-right">
-                                <div class="text-gray-900 dark:text-white">{{ payment.member.name }}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ payment.member.member_id }}</div>
+                                <div class="text-gray-900 dark:text-white">
+                                    {{ payment.member.name }}
+                                </div>
+                                <div
+                                    class="text-sm text-gray-500 dark:text-gray-400"
+                                >
+                                    {{ payment.member.member_id }}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Receipt Notice -->
-                    <div class="mt-6 rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
+                    <div
+                        class="mt-6 rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20"
+                    >
                         <div class="flex items-start gap-3">
-                            <Mail class="mt-0.5 h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            <Mail
+                                class="mt-0.5 h-5 w-5 text-blue-600 dark:text-blue-400"
+                            />
                             <div>
-                                <p class="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                <p
+                                    class="text-sm font-medium text-blue-900 dark:text-blue-100"
+                                >
                                     Receipt Sent
                                 </p>
-                                <p class="text-sm text-blue-700 dark:text-blue-300">
-                                    A payment receipt has been sent to {{ payment.member.email }}
+                                <p
+                                    class="text-sm text-blue-700 dark:text-blue-300"
+                                >
+                                    A payment receipt has been sent to
+                                    {{ payment.member.email }}
                                 </p>
                             </div>
                         </div>
@@ -150,8 +210,11 @@ const formatDate = (dateString: string) => {
                 </div>
 
                 <!-- Footer -->
-                <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-                    If you have any questions about this payment, please contact our support team.
+                <p
+                    class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400"
+                >
+                    If you have any questions about this payment, please contact
+                    our support team.
                 </p>
             </div>
         </div>

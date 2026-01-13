@@ -7,6 +7,15 @@ echo "Starting StrongSuite deployment..."
 echo "Waiting for database to be ready..."
 sleep 10
 
+# Ensure storage directory has correct permissions (important for Railway volumes)
+echo "Setting storage permissions..."
+chmod -R 777 /var/www/html/storage/app/public || true
+chmod -R 777 /var/www/html/storage/framework || true
+chmod -R 777 /var/www/html/storage/logs || true
+
+# Ensure member photos directory exists
+mkdir -p /var/www/html/storage/app/public/members/photos || true
+
 # Clear any cached config that might have wrong values
 echo "Clearing cached configuration..."
 php artisan config:clear || true

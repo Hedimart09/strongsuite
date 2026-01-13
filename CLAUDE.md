@@ -43,6 +43,29 @@ npm run build               # Build frontend assets for production
 npm run build:ssr           # Build with SSR support
 ```
 
+## Deployment
+
+### Railway Deployment
+
+The application is deployed on Railway using Docker. See `RAILWAY_SETUP.md` for detailed setup instructions.
+
+**Critical: Persistent Storage**
+- Member profile pictures are stored in `storage/app/public/members/photos`
+- Railway deployments are ephemeral and will **delete uploaded files** on each redeploy
+- **MUST configure a Railway Volume** at `/var/www/html/storage/app/public` to persist files across deployments
+- Without the volume, all member photos will be lost on every deployment
+
+**Deployment Files:**
+- `Dockerfile` - Docker image configuration with volume declaration
+- `docker-entrypoint.sh` - Startup script (migrations, storage link, permissions)
+- `railway.json` - Railway build configuration
+- `supervisord.conf` - Process manager for running server + queue worker
+
+**Automatic Deployments:**
+- Pushing to `main` branch triggers automatic Railway deployment
+- Migrations run automatically via `docker-entrypoint.sh`
+- Admin users and roles are seeded on deployment
+
 ## Application Architecture
 
 ### Domain Model Structure
@@ -106,10 +129,38 @@ beforeEach(function () {
 });
 ```
 
+### Member Portal Authentication
+
+The application includes a **separate authentication system for gym members** (distinct from staff/admin):
+
+**Key Features:**
+- Members authenticate using a 4-digit PIN code (not email/password)
+- PIN is stored hashed on the `members` table
+- Uses custom `member.auth` middleware (not Laravel's default `auth`)
+- Member model implements `AuthenticatableContract` for session management
+- Separate guard configuration for member authentication
+
+**Routes:**
+- Member login: `/member/login`
+- Member dashboard: `/member/dashboard` (requires `member.auth` middleware)
+- Member check-in: `/member/check-in` (self-service attendance)
+
+**Controllers:**
+- `MemberAuthController` - Handles member login/logout
+- `MemberDashboardController` - Member-facing dashboard
+- `MemberCheckInController` - Self-service check-in/out
+
+**Testing member routes:** Use `$this->actingAs($member, 'member')` to authenticate as a member in tests.
+
 ### Route Organization
 
-Routes in `routes/web.php` follow this pattern:
-- All routes require `auth` and `verified` middleware
+**Route Files:**
+- `routes/web.php` - Main application routes (members, subscriptions, payments, etc.)
+- `routes/settings.php` - User settings routes (profile, password, 2FA, appearance)
+- `routes/console.php` - Artisan console commands
+
+**Routing Patterns:**
+- All staff routes require `auth` and `verified` middleware
 - Routes are grouped by permission middleware
 - **IMPORTANT:** Specific routes (e.g., `/create`, `/edit`) MUST come before parameterized routes (e.g., `/{id}`)
 - Routes accept both `PUT` and `PATCH` for updates using `Route::match(['put', 'patch'], ...)`
@@ -152,18 +203,40 @@ Route::middleware('permission:members.view')->group(function () {
 - Vue 3 with Composition API
 - Inertia.js v2 for SPA-like experience without API
 - Tailwind CSS v4 for styling
-- Reka UI for component primitives
+- Reka UI for component primitives (headless UI components)
 - Lucide Vue for icons
+- VueUse for composition utilities
 
-**Page Components:** Located in `resources/js/Pages/` following domain structure:
-- Members/Index.vue, Members/Show.vue, etc.
-- Attendance/Index.vue, Attendance/Scan.vue, etc.
+**Directory Structure:**
+- `resources/js/Pages/` - Inertia page components by domain (Members, Attendance, Payments, etc.)
+- `resources/js/Layouts/` - Layout wrappers (AppLayout, AuthLayout, and nested layout variants)
+- `resources/js/components/` - Reusable Vue components (AppShell, AppSidebar, NavMain, etc.)
+
+**Component Patterns:**
+- Use Reka UI primitives for accessible, headless components (dialogs, dropdowns, etc.)
+- Check `resources/js/components/` for existing components before creating new ones
+- Layouts use nested structure: `Layouts/app/`, `Layouts/auth/`, `Layouts/settings/`
 
 **Wayfinder Integration:** Type-safe route helpers generated from Laravel routes
 ```typescript
 import { show, store } from '@/actions/App/Http/Controllers/MemberController'
 show(1) // { url: "/members/1", method: "get" }
 ```
+
+### Build Configuration
+
+**Vite Setup (vite.config.ts):**
+- Uses esbuild for minification (replaced terser for better performance)
+- Automatic console/debugger removal in production builds
+- Manual code splitting: vendor chunk (vue, @inertiajs/vue3)
+- SSR support configured via `resources/js/ssr.ts`
+- Wayfinder plugin with form variants enabled
+
+**Critical Build Notes:**
+- When you modify routes, Wayfinder auto-regenerates TypeScript route helpers
+- Build uses esbuild minifier, NOT terser (this was changed in recent commits)
+- CSS minification enabled for production
+- Chunk size warning limit set to 1000kb
 
 ### Database Schema Key Points
 
@@ -177,10 +250,17 @@ show(1) // { url: "/members/1", method: "get" }
 
 ### Important Patterns
 
-**ID Generation:** Members get auto-generated unique IDs:
+**ID Generation:** Models get auto-generated unique IDs:
 - `member_id`: MEM-{8-digit-number}
 - `qr_code`: QR-{12-digit-number}
 - Invoice: `invoice_number`: INV-{8-digit-number}
+
+**Form Request Validation:**
+- All validation uses Form Request classes (app/Http/Requests/)
+- Naming convention: `Store{Model}Request` for creation, `Update{Model}Request` for updates
+- Examples: `StoreMemberRequest`, `UpdateMemberRequest`, `StoreSubscriptionRequest`
+- Never use inline validation in controllers - always create/use Form Request classes
+- Check existing Form Requests to follow array vs string validation style
 
 **Scope Methods:**
 - `MembershipPlan::active()` - Get only active plans

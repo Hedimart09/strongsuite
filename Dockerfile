@@ -68,6 +68,10 @@ RUN mkdir -p storage/app/public/members/photos \
 # Set permissions (run as root, so use 777 for storage)
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Declare volume for persistent storage (Railway will mount this)
+# This ensures uploaded files survive across deployments
+VOLUME ["/var/www/html/storage/app/public"]
+
 # Copy supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

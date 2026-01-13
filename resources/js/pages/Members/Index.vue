@@ -286,9 +286,7 @@ const getStatusClass = (memberStatus: string) => {
                 >
                     <div class="text-sm text-muted-foreground">
                         Showing
-                        {{
-                            (members.current_page - 1) * members.per_page + 1
-                        }}
+                        {{ (members.current_page - 1) * members.per_page + 1 }}
                         to
                         {{
                             Math.min(

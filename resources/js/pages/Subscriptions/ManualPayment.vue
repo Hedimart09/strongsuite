@@ -205,7 +205,7 @@ const submit = () => {
                             >
                             <div class="relative">
                                 <span
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+                                    class="absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground"
                                     >{{ invoice.currency }}</span
                                 >
                                 <input
@@ -215,7 +215,7 @@ const submit = () => {
                                     step="1"
                                     min="100"
                                     required
-                                    class="w-full rounded-lg border border-input bg-background py-2 pl-14 pr-3 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                    class="w-full rounded-lg border border-input bg-background py-2 pr-3 pl-14 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                     :class="{
                                         'border-red-500': form.errors.amount,
                                     }"
@@ -303,9 +303,7 @@ const submit = () => {
                         class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
                     >
                         {{
-                            form.processing
-                                ? 'Recording...'
-                                : 'Record Payment'
+                            form.processing ? 'Recording...' : 'Record Payment'
                         }}
                     </button>
                 </div>
