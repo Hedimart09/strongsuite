@@ -66,6 +66,13 @@ The application is deployed on Railway using Docker. See `RAILWAY_SETUP.md` for 
 - Migrations run automatically via `docker-entrypoint.sh`
 - Admin users and roles are seeded on deployment
 
+**Email Configuration:**
+- Emails are **queued** (non-blocking) using database queue driver
+- Queue worker runs automatically via Supervisor (`supervisord.conf`)
+- Production email requires configuring SMTP service in Railway environment variables
+- See `EMAIL_SETUP.md` for detailed email service setup (Mailtrap, Mailgun, Gmail, etc.)
+- Local development uses `MAIL_MAILER=log` (emails logged to `storage/logs/laravel.log`)
+
 ## Application Architecture
 
 ### Domain Model Structure

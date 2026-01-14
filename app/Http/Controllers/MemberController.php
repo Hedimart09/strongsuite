@@ -83,13 +83,13 @@ class MemberController extends Controller
         // Generate PIN URL
         $pinUrl = route('member.pin.view', ['token' => $token]);
 
-        // Send email to member (non-blocking)
+        // Queue email to member (non-blocking - processed by queue worker)
         try {
-            Mail::to($member->email)->send(new MemberPinMail($member, $pinUrl));
-            $message = 'Member registered successfully! A secure PIN link has been sent to '.$member->email;
+            Mail::to($member->email)->queue(new MemberPinMail($member, $pinUrl));
+            $message = 'Member registered successfully! A secure PIN link will be sent to '.$member->email.' shortly.';
         } catch (\Exception $e) {
-            \Log::error('Failed to send member PIN email: '.$e->getMessage());
-            $message = 'Member registered successfully! Note: Email notification could not be sent. PIN: '.$pin;
+            \Log::error('Failed to queue member PIN email: '.$e->getMessage());
+            $message = 'Member registered successfully! Note: Email notification could not be queued. Please check email configuration.';
         }
 
         return redirect()->route('members.show', $member)
