@@ -44,9 +44,11 @@ If the photo persists, the volume is configured correctly! ✅
 ## How It Works
 
 - **Volume Mount**: Railway mounts `/var/www/html/storage/app/public` as a persistent volume
-- **Dockerfile**: Declares the volume mount point with `VOLUME ["/var/www/html/storage/app/public"]`
-- **Entrypoint**: Sets correct permissions on the volume at startup
+- **Dashboard Configuration**: Volume is configured entirely in Railway dashboard (NOT in Dockerfile)
+- **Entrypoint**: Sets correct permissions on the volume at startup via `docker-entrypoint.sh`
 - **Persistence**: All files in this directory survive across deployments
+
+⚠️ **Important**: Railway does NOT allow the `VOLUME` keyword in Dockerfiles. Volumes must be configured through the Railway dashboard only.
 
 ---
 

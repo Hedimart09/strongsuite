@@ -68,9 +68,9 @@ RUN mkdir -p storage/app/public/members/photos \
 # Set permissions (run as root, so use 777 for storage)
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Declare volume for persistent storage (Railway will mount this)
-# This ensures uploaded files survive across deployments
-VOLUME ["/var/www/html/storage/app/public"]
+# NOTE: Railway volumes must be configured in the Railway dashboard, not in Dockerfile
+# See RAILWAY_SETUP.md for instructions on setting up persistent storage
+# Volume mount path: /var/www/html/storage/app/public
 
 # Copy supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
