@@ -28,6 +28,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import { getInitials } from '@/composables/useInitials';
 import { toUrl, urlIsActive } from '@/lib/utils';
@@ -198,6 +199,8 @@ const rightNavItems: NavItem[] = [
                                 class="size-5 opacity-80 group-hover:opacity-100"
                             />
                         </Button>
+
+                        <ThemeToggle />
 
                         <div class="hidden space-x-1 lg:flex">
                             <template
