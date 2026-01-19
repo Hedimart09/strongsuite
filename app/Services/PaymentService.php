@@ -69,12 +69,19 @@ class PaymentService
         return DB::transaction(function () use ($gatewayInstance, $gateway, $data) {
             // Cancel any existing pending payments for this subscription
             if (isset($data['subscription_id'])) {
-                Payment::where('subscription_id', $data['subscription_id'])
+                $pendingPayments = Payment::where('subscription_id', $data['subscription_id'])
                     ->where('status', 'pending')
-                    ->update([
+                    ->get();
+
+                foreach ($pendingPayments as $pendingPayment) {
+                    $pendingPayment->update([
                         'status' => 'cancelled',
-                        'metadata' => DB::raw("JSON_SET(COALESCE(metadata, '{}'), '$.cancelled_reason', 'New payment initialized', '$.cancelled_at', '".now()->toIso8601String()."')"),
+                        'metadata' => array_merge($pendingPayment->metadata ?? [], [
+                            'cancelled_reason' => 'New payment initialized',
+                            'cancelled_at' => now()->toIso8601String(),
+                        ]),
                     ]);
+                }
 
                 Log::info('Cancelled pending payments for subscription', [
                     'subscription_id' => $data['subscription_id'],
