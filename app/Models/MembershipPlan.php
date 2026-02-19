@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
+use Money\Formatter\DecimalMoneyFormatter;
 use Money\Formatter\IntlMoneyFormatter;
 use Money\Money;
 
@@ -54,8 +55,13 @@ class MembershipPlan extends Model
     {
         $money = $this->getMoney();
         $currencies = new ISOCurrencies;
-        $numberFormatter = new \NumberFormatter(config('app.locale', 'en_US'), \NumberFormatter::CURRENCY);
-        $moneyFormatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+
+        if (extension_loaded('intl')) {
+            $numberFormatter = new \NumberFormatter(config('app.locale', 'en_US'), \NumberFormatter::CURRENCY);
+            $moneyFormatter = new IntlMoneyFormatter($numberFormatter, $currencies);
+        } else {
+            $moneyFormatter = new DecimalMoneyFormatter($currencies);
+        }
 
         return $moneyFormatter->format($money);
     }

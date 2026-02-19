@@ -190,7 +190,7 @@ it('sends pin email when creating new member', function () {
     expect($member->pin)->not->toBe(''); // PIN should be hashed
 
     // Check that email was sent
-    Mail::assertSent(MemberPinMail::class, function ($mail) use ($member) {
+    Mail::assertQueued(MemberPinMail::class, function ($mail) use ($member) {
         return $mail->hasTo('test@example.com') &&
                $mail->member->id === $member->id;
     });

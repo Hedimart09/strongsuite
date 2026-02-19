@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,16 +47,18 @@ class Member extends Model implements AuthenticatableContract
 
     public function getPhotoUrlAttribute(): ?string
     {
-        if (!$this->attributes['photo']) {
+        $photo = $this->attributes['photo'] ?? null;
+
+        if (! $photo) {
             return null;
         }
 
         // If it already has http/https, return as is
-        if (str_starts_with($this->attributes['photo'], 'http')) {
-            return $this->attributes['photo'];
+        if (str_starts_with($photo, 'http')) {
+            return $photo;
         }
 
-        return Storage::disk('public')->url($this->attributes['photo']);
+        return Storage::disk('public')->url($photo);
     }
 
     public function user(): BelongsTo
@@ -83,6 +84,21 @@ class Member extends Model implements AuthenticatableContract
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function classBookings(): HasMany
+    {
+        return $this->hasMany(ClassBooking::class);
+    }
+
+    public function upcomingClassBookings(): HasMany
+    {
+        return $this->classBookings()
+            ->whereIn('status', ['booked', 'waitlisted'])
+            ->whereHas('gymClass', function ($q) {
+                $q->where('start_time', '>', now())
+                    ->where('status', 'scheduled');
+            });
     }
 
     public function activeSubscription(): HasMany
